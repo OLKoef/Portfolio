@@ -24,26 +24,48 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
     }
 
     const fileArray = Array.from(files);
+
+    // Validate files before proceeding
+    const validation = FileUploadService.validateFiles(fileArray);
+    if (!validation.isValid) {
+      onUploadError?.(`File validation failed:\n${validation.errors.join('\n')}`);
+      return;
+    }
+
     setSelectedFiles(fileArray);
     setShowMetadataForm(true);
   };
   
   const handleUploadWithMetadata = async () => {
     setUploading(true);
-    
+
     try {
       const additionalMetadata = {
         ...metadata,
         tags: metadata.tags.split(',').map(tag => tag.trim()).filter(Boolean)
       };
-      
-      const uploadPromises = selectedFiles.map(file => 
-        FileUploadService.uploadFile(file, currentUser.uid, 'uploads', additionalMetadata)
-      );
-      
-      const uploadedFiles = await Promise.all(uploadPromises);
-      onUploadSuccess?.(uploadedFiles);
-      
+
+      const uploadResults = [];
+      const uploadErrors = [];
+
+      // Upload files one by one to handle individual errors
+      for (const file of selectedFiles) {
+        try {
+          const result = await FileUploadService.uploadFile(file, currentUser.uid, 'uploads', additionalMetadata);
+          uploadResults.push(result);
+        } catch (error) {
+          uploadErrors.push(`${file.name}: ${error.message}`);
+        }
+      }
+
+      if (uploadResults.length > 0) {
+        onUploadSuccess?.(uploadResults);
+      }
+
+      if (uploadErrors.length > 0) {
+        onUploadError?.(`Some files failed to upload:\n${uploadErrors.join('\n')}`);
+      }
+
       // Reset form
       setSelectedFiles([]);
       setShowMetadataForm(false);
@@ -63,15 +85,29 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
   
   const handleQuickUpload = async () => {
     setUploading(true);
-    
+
     try {
-      const uploadPromises = selectedFiles.map(file => 
-        FileUploadService.uploadFile(file, currentUser.uid)
-      );
-      
-      const uploadedFiles = await Promise.all(uploadPromises);
-      onUploadSuccess?.(uploadedFiles);
-      
+      const uploadResults = [];
+      const uploadErrors = [];
+
+      // Upload files one by one to handle individual errors
+      for (const file of selectedFiles) {
+        try {
+          const result = await FileUploadService.uploadFile(file, currentUser.uid);
+          uploadResults.push(result);
+        } catch (error) {
+          uploadErrors.push(`${file.name}: ${error.message}`);
+        }
+      }
+
+      if (uploadResults.length > 0) {
+        onUploadSuccess?.(uploadResults);
+      }
+
+      if (uploadErrors.length > 0) {
+        onUploadError?.(`Some files failed to upload:\n${uploadErrors.join('\n')}`);
+      }
+
       // Reset form
       setSelectedFiles([]);
       setShowMetadataForm(false);
@@ -131,7 +167,7 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
             multiple
             style={{ display: 'none' }}
             onChange={(e) => handleFileSelect(e.target.files)}
-            accept=".pdf,.docx,.doc,.txt,.js,.jsx,.ts,.tsx,.css,.html,.png,.jpg,.jpeg,.gif,.svg,.dwg,.dxf,.step,.iges,.xlsx,.xls,.csv,.pptx,.ppt,.py,.java,.cpp,.c,.md,.zip,.rar,.7z"
+            accept=".pdf,.docx,.doc,.txt,.rtf,.odt,.xls,.xlsx,.csv,.ods,.ppt,.pptx,.odp,.jpg,.jpeg,.png,.gif,.svg,.bmp,.webp,.dwg,.dxf,.step,.stp,.iges,.igs,.js,.jsx,.ts,.tsx,.py,.java,.cpp,.c,.h,.css,.html,.php,.rb,.go,.rs,.zip,.rar,.7z,.tar,.gz,.md,.json,.xml,.yaml,.yml"
           />
         </>
       ) : (
