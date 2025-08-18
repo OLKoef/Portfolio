@@ -42,8 +42,8 @@ function AppContent() {
             <BuilderPage urlPath="/" />
             <div className="fallback-content">
               <section className="hero-section">
-                <h2>Welcome to Your Portfolio</h2>
-                <p>This content is managed through Builder.io. Connect your Builder.io account and create content to see it here.</p>
+                <h2>Welcome to Student Document Hub</h2>
+                <p>Your centralized platform for managing engineering projects, course documents, and academic files. Upload, organize, and access your academic work with automatic categorization and tagging.</p>
               </section>
               
               <section className="features-section">
