@@ -50,16 +50,16 @@ function AppContent() {
                 <h3>Features</h3>
                 <div className="features-grid">
                   <div className="feature-card">
-                    <h4>Content Management</h4>
-                    <p>Manage your portfolio content with Builder.io's visual editor</p>
+                    <h4>Smart Categorization</h4>
+                    <p>Automatic file categorization by type: Documents, CAD, Code, Images, and more</p>
                   </div>
                   <div className="feature-card">
-                    <h4>File Storage</h4>
-                    <p>Upload and manage your documents, images, and code files</p>
+                    <h4>Enhanced Metadata</h4>
+                    <p>Add course codes, descriptions, tags, and semester information to organize your work</p>
                   </div>
                   <div className="feature-card">
-                    <h4>Authentication</h4>
-                    <p>Secure login with email/password or Google authentication</p>
+                    <h4>Advanced Search & Filter</h4>
+                    <p>Find files quickly by category, tags, course code, or content search</p>
                   </div>
                 </div>
               </section>
