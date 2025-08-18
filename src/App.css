@@ -861,6 +861,17 @@ body {
   font-size: 0.75rem;
 }
 
+.file-description {
+  color: #6b7280;
+  font-size: 0.75rem;
+  margin: 0.25rem 0;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
 /* Filter controls */
 .file-filters {
   background: #f8fafc;
