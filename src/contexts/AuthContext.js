@@ -1,9 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { 
-  signInWithEmailAndPassword, 
+import {
+  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithPopup,
-  GoogleAuthProvider,
   signOut,
   onAuthStateChanged
 } from 'firebase/auth';
@@ -20,7 +18,6 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [firebaseError, setFirebaseError] = useState(null);
 
-  const googleProvider = new GoogleAuthProvider();
 
   // Check if Firebase is configured
   useEffect(() => {
@@ -54,10 +51,6 @@ export function AuthProvider({ children }) {
     return signInWithEmailAndPassword(auth, email, password);
   }
 
-  async function loginWithGoogle() {
-    if (!auth) throw new Error('Firebase Auth not configured');
-    return signInWithPopup(auth, googleProvider);
-  }
 
   async function logout() {
     if (!auth) throw new Error('Firebase Auth not configured');
@@ -68,7 +61,6 @@ export function AuthProvider({ children }) {
     currentUser,
     signup,
     login,
-    loginWithGoogle,
     logout,
     firebaseError,
     isFirebaseConfigured
