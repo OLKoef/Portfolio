@@ -24,13 +24,23 @@ const validateFirebaseConfig = () => {
     'REACT_APP_FIREBASE_APP_ID'
   ];
 
+  console.log('Checking Firebase environment variables...');
+  console.log('Available env vars:', requiredKeys.map(key => ({
+    key,
+    exists: !!process.env[key],
+    value: process.env[key] ? `${process.env[key].substring(0, 10)}...` : 'undefined'
+  })));
+
   const missingKeys = requiredKeys.filter(key => !process.env[key]);
-  
+
   if (missingKeys.length > 0) {
     console.error('Missing Firebase environment variables:', missingKeys);
+    console.error('All process.env keys starting with REACT_APP_FIREBASE:',
+      Object.keys(process.env).filter(key => key.startsWith('REACT_APP_FIREBASE')));
     return false;
   }
 
+  console.log('✅ All Firebase environment variables are present');
   return true;
 };
 
