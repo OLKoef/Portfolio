@@ -7,13 +7,15 @@ export default function FileManager() {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState('');
-  const { currentUser } = useAuth();
+  const { currentUser, isFirebaseConfigured } = useAuth();
 
   useEffect(() => {
-    if (currentUser) {
+    if (currentUser && isFirebaseConfigured) {
       loadFiles();
+    } else {
+      setLoading(false);
     }
-  }, [currentUser]);
+  }, [currentUser, isFirebaseConfigured]);
 
   const loadFiles = async () => {
     try {
@@ -70,6 +72,17 @@ export default function FileManager() {
     return (
       <div className="file-manager">
         <p>Please log in to manage your files.</p>
+      </div>
+    );
+  }
+
+  if (!isFirebaseConfigured) {
+    return (
+      <div className="file-manager">
+        <div className="config-error">
+          <h3>🔧 Firebase Configuration Required</h3>
+          <p>File storage requires Firebase to be properly configured. Please check your environment variables.</p>
+        </div>
       </div>
     );
   }
