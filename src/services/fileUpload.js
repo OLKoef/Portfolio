@@ -4,6 +4,89 @@ import { storage, db } from '../firebase/config';
 
 export class FileUploadService {
 
+  // File validation constants
+  static MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+  static ALLOWED_EXTENSIONS = [
+    // Documents
+    'pdf', 'doc', 'docx', 'txt', 'rtf', 'odt',
+    // Spreadsheets
+    'xls', 'xlsx', 'csv', 'ods',
+    // Presentations
+    'ppt', 'pptx', 'odp',
+    // Images
+    'jpg', 'jpeg', 'png', 'gif', 'svg', 'bmp', 'webp',
+    // CAD files
+    'dwg', 'dxf', 'step', 'stp', 'iges', 'igs',
+    // Code files
+    'js', 'jsx', 'ts', 'tsx', 'py', 'java', 'cpp', 'c', 'h', 'css', 'html', 'php', 'rb', 'go', 'rs',
+    // Archives
+    'zip', 'rar', '7z', 'tar', 'gz',
+    // Others
+    'md', 'json', 'xml', 'yaml', 'yml'
+  ];
+
+  // Validate file before upload
+  static validateFile(file) {
+    const errors = [];
+
+    // Check file size
+    if (file.size > this.MAX_FILE_SIZE) {
+      errors.push(`File size exceeds ${this.MAX_FILE_SIZE / (1024 * 1024)}MB limit`);
+    }
+
+    // Check file extension
+    const extension = file.name.split('.').pop().toLowerCase();
+    if (!this.ALLOWED_EXTENSIONS.includes(extension)) {
+      errors.push(`File type '.${extension}' is not supported`);
+    }
+
+    // Check filename length
+    if (file.name.length > 255) {
+      errors.push('Filename is too long (max 255 characters)');
+    }
+
+    // Check for empty files
+    if (file.size === 0) {
+      errors.push('Cannot upload empty files');
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors
+    };
+  }
+
+  // Validate multiple files
+  static validateFiles(files) {
+    const results = [];
+    let totalSize = 0;
+
+    for (const file of files) {
+      const validation = this.validateFile(file);
+      results.push({ file, ...validation });
+      totalSize += file.size;
+    }
+
+    // Check total upload size (500MB limit for batch)
+    const MAX_TOTAL_SIZE = 500 * 1024 * 1024;
+    if (totalSize > MAX_TOTAL_SIZE) {
+      return {
+        isValid: false,
+        errors: [`Total upload size exceeds ${MAX_TOTAL_SIZE / (1024 * 1024)}MB limit`],
+        fileResults: results
+      };
+    }
+
+    const hasErrors = results.some(result => !result.isValid);
+    const allErrors = results.flatMap(result => result.errors);
+
+    return {
+      isValid: !hasErrors,
+      errors: allErrors,
+      fileResults: results
+    };
+  }
+
   // File categorization based on type and extension
   static categorizeFile(file) {
     const extension = file.name.split('.').pop().toLowerCase();
@@ -58,6 +141,12 @@ export class FileUploadService {
   
   static async uploadFile(file, userId, folder = 'uploads', additionalMetadata = {}) {
     try {
+      // Validate file before upload
+      const validation = this.validateFile(file);
+      if (!validation.isValid) {
+        throw new Error(`File validation failed: ${validation.errors.join(', ')}`);
+      }
+
       // Generate unique filename with timestamp
       const timestamp = Date.now();
       const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
@@ -98,7 +187,21 @@ export class FileUploadService {
       };
     } catch (error) {
       console.error('Error uploading file:', error);
-      throw error;
+
+      // Provide more specific error messages
+      if (error.code === 'storage/unauthorized') {
+        throw new Error('Upload failed: You do not have permission to upload files');
+      } else if (error.code === 'storage/canceled') {
+        throw new Error('Upload was canceled');
+      } else if (error.code === 'storage/quota-exceeded') {
+        throw new Error('Upload failed: Storage quota exceeded');
+      } else if (error.code === 'storage/invalid-checksum') {
+        throw new Error('Upload failed: File integrity check failed');
+      } else if (error.message.includes('File validation failed')) {
+        throw error; // Re-throw validation errors as-is
+      } else {
+        throw new Error(`Upload failed: ${error.message}`);
+      }
     }
   }
 
@@ -107,12 +210,26 @@ export class FileUploadService {
       // Delete from Storage
       const fileRef = ref(storage, storagePath);
       await deleteObject(fileRef);
-      
+
       // Delete from Firestore
       await deleteDoc(doc(db, 'files', fileId));
     } catch (error) {
       console.error('Error deleting file:', error);
-      throw error;
+
+      // Provide more specific error messages
+      if (error.code === 'storage/object-not-found') {
+        // File doesn't exist in storage, but we should still remove from Firestore
+        try {
+          await deleteDoc(doc(db, 'files', fileId));
+        } catch (firestoreError) {
+          console.error('Error deleting from Firestore:', firestoreError);
+        }
+        throw new Error('File was already deleted from storage');
+      } else if (error.code === 'storage/unauthorized') {
+        throw new Error('Delete failed: You do not have permission to delete this file');
+      } else {
+        throw new Error(`Delete failed: ${error.message}`);
+      }
     }
   }
 
