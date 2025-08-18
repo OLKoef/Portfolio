@@ -546,6 +546,105 @@ body {
   color: #64748b;
 }
 
+/* Configuration Error Styles */
+.config-error {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin: 1rem 0;
+}
+
+.config-error h3 {
+  color: #92400e;
+  margin-bottom: 1rem;
+  font-size: 1.125rem;
+}
+
+.config-error p {
+  color: #78350f;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.env-vars-list {
+  background: #451a03;
+  color: #fcd34d;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  margin: 1rem 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+}
+
+.env-vars-list code {
+  display: block;
+  margin-bottom: 0.25rem;
+  background: none;
+  color: inherit;
+  padding: 0;
+}
+
+.setup-instructions {
+  margin-top: 1rem;
+}
+
+.setup-instructions h4 {
+  color: #92400e;
+  margin-bottom: 0.5rem;
+}
+
+.setup-instructions ol {
+  color: #78350f;
+  padding-left: 1.5rem;
+}
+
+.setup-instructions li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
+}
+
+.setup-instructions a {
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+.error-details {
+  background: #fee2e2;
+  color: #dc2626;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  margin-top: 1rem;
+  font-size: 0.875rem;
+}
+
+.builder-config-warning {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin: 1rem 0;
+  text-align: center;
+}
+
+.builder-config-warning h3 {
+  color: #92400e;
+  margin-bottom: 0.5rem;
+}
+
+.builder-config-warning p {
+  color: #78350f;
+}
+
+.builder-config-warning code {
+  background: #451a03;
+  color: #fcd34d;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  font-family: 'Courier New', monospace;
+  font-size: 0.875rem;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .header-content {
