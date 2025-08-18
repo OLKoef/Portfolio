@@ -8,7 +8,48 @@ export function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   
-  const { login, signup, loginWithGoogle } = useAuth();
+  const { login, signup, loginWithGoogle, firebaseError, isFirebaseConfigured } = useAuth();
+
+  // Show configuration error if Firebase is not set up
+  if (!isFirebaseConfigured) {
+    return (
+      <div className="auth-container">
+        <div className="auth-card">
+          <h2>Configuration Required</h2>
+          <div className="config-error">
+            <h3>🔧 Firebase Setup Required</h3>
+            <p>To use authentication and file storage, please configure your Firebase environment variables:</p>
+            
+            <div className="env-vars-list">
+              <code>REACT_APP_FIREBASE_API_KEY</code>
+              <code>REACT_APP_FIREBASE_AUTH_DOMAIN</code>
+              <code>REACT_APP_FIREBASE_PROJECT_ID</code>
+              <code>REACT_APP_FIREBASE_STORAGE_BUCKET</code>
+              <code>REACT_APP_FIREBASE_MESSAGING_SENDER_ID</code>
+              <code>REACT_APP_FIREBASE_APP_ID</code>
+            </div>
+
+            <div className="setup-instructions">
+              <h4>Setup Instructions:</h4>
+              <ol>
+                <li>Create a Firebase project at <a href="https://console.firebase.google.com/" target="_blank" rel="noopener noreferrer">Firebase Console</a></li>
+                <li>Enable Authentication (Email/Password and Google)</li>
+                <li>Enable Firestore and Storage</li>
+                <li>Get your config values from Project Settings</li>
+                <li>Add them as environment variables in your deployment platform</li>
+              </ol>
+            </div>
+
+            {firebaseError && (
+              <div className="error-details">
+                <strong>Error:</strong> {firebaseError}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
