@@ -3,11 +3,11 @@ import { useAuth } from '../contexts/AuthContext';
 
 export function LoginForm() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [pin, setPin] = useState('');
   const [isSignup, setIsSignup] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   const { login, signup, firebaseError, isFirebaseConfigured } = useAuth();
 
   // Show configuration error if Firebase is not set up
@@ -58,9 +58,9 @@ export function LoginForm() {
     
     try {
       if (isSignup) {
-        await signup(email, password);
+        await signup(email, pin);
       } else {
-        await login(email, password);
+        await login(email, pin);
       }
     } catch (error) {
       setError(error.message);
@@ -91,12 +91,21 @@ export function LoginForm() {
           
           <div className="form-group">
             <input
-              type="password"
-              placeholder="Password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
+              placeholder="Enter 4 or 6 digit PIN"
+              value={pin}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, ''); // Only allow digits
+                if (value.length <= 6) {
+                  setPin(value);
+                }
+              }}
               required
-              className="form-input"
+              minLength={4}
+              maxLength={6}
+              className="form-input pin-input"
             />
           </div>
           

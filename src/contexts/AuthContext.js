@@ -41,14 +41,30 @@ export function AuthProvider({ children }) {
     return unsubscribe;
   }, []);
 
-  async function signup(email, password) {
+  async function signup(email, pin) {
     if (!auth) throw new Error('Firebase Auth not configured');
-    return createUserWithEmailAndPassword(auth, email, password);
+
+    // Validate PIN format
+    if (!pin || pin.length < 4 || pin.length > 6 || !/^\d+$/.test(pin)) {
+      throw new Error('PIN must be 4-6 digits');
+    }
+
+    // Use email + PIN as password (you might want to hash this for production)
+    const tempPassword = `${email}_${pin}_temp`;
+    return createUserWithEmailAndPassword(auth, email, tempPassword);
   }
 
-  async function login(email, password) {
+  async function login(email, pin) {
     if (!auth) throw new Error('Firebase Auth not configured');
-    return signInWithEmailAndPassword(auth, email, password);
+
+    // Validate PIN format
+    if (!pin || pin.length < 4 || pin.length > 6 || !/^\d+$/.test(pin)) {
+      throw new Error('PIN must be 4-6 digits');
+    }
+
+    // Use email + PIN as password (you might want to hash this for production)
+    const tempPassword = `${email}_${pin}_temp`;
+    return signInWithEmailAndPassword(auth, email, tempPassword);
   }
 
 
