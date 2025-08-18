@@ -25,11 +25,11 @@ function AppContent() {
             >
               Portfolio
             </button>
-            <button 
+            <button
               className={`nav-button ${activeTab === 'files' ? 'active' : ''}`}
               onClick={() => setActiveTab('files')}
             >
-              Files
+              Documents
             </button>
           </nav>
           <UserProfile />
