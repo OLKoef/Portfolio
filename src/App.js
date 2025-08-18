@@ -17,7 +17,7 @@ function AppContent() {
     <div className="app">
       <header className="app-header">
         <div className="header-content">
-          <h1 className="app-title">Portfolio</h1>
+          <h1 className="app-title">Student Document Hub</h1>
           <nav className="main-nav">
             <button 
               className={`nav-button ${activeTab === 'portfolio' ? 'active' : ''}`}
@@ -25,11 +25,11 @@ function AppContent() {
             >
               Portfolio
             </button>
-            <button 
+            <button
               className={`nav-button ${activeTab === 'files' ? 'active' : ''}`}
               onClick={() => setActiveTab('files')}
             >
-              Files
+              Documents
             </button>
           </nav>
           <UserProfile />
@@ -42,24 +42,24 @@ function AppContent() {
             <BuilderPage urlPath="/" />
             <div className="fallback-content">
               <section className="hero-section">
-                <h2>Welcome to Your Portfolio</h2>
-                <p>This content is managed through Builder.io. Connect your Builder.io account and create content to see it here.</p>
+                <h2>Welcome to Student Document Hub</h2>
+                <p>Your centralized platform for managing engineering projects, course documents, and academic files. Upload, organize, and access your academic work with automatic categorization and tagging.</p>
               </section>
               
               <section className="features-section">
                 <h3>Features</h3>
                 <div className="features-grid">
                   <div className="feature-card">
-                    <h4>Content Management</h4>
-                    <p>Manage your portfolio content with Builder.io's visual editor</p>
+                    <h4>Smart Categorization</h4>
+                    <p>Automatic file categorization by type: Documents, CAD, Code, Images, and more</p>
                   </div>
                   <div className="feature-card">
-                    <h4>File Storage</h4>
-                    <p>Upload and manage your documents, images, and code files</p>
+                    <h4>Enhanced Metadata</h4>
+                    <p>Add course codes, descriptions, tags, and semester information to organize your work</p>
                   </div>
                   <div className="feature-card">
-                    <h4>Authentication</h4>
-                    <p>Secure login with email/password or Google authentication</p>
+                    <h4>Advanced Search & Filter</h4>
+                    <p>Find files quickly by category, tags, course code, or content search</p>
                   </div>
                 </div>
               </section>
