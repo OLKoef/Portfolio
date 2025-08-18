@@ -993,6 +993,35 @@ body {
     width: 2rem;
     height: 2rem;
   }
+
+  .filter-row {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .form-actions {
+    flex-direction: column;
+  }
+
+  .upload-button {
+    width: 100%;
+  }
+
+  .metadata-form {
+    padding: 1rem;
+  }
+
+  .file-card {
+    padding: 0.75rem;
+  }
+
+  .file-enhanced-info {
+    gap: 0.125rem;
+  }
 }
 
 @media (max-width: 480px) {
