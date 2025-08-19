@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { FileUploadService } from '../services/fileUpload';
+import { isFirebaseConfigured } from '../firebase/config';
 
 export default function FileUpload({ onUploadSuccess, onUploadError }) {
   const [uploading, setUploading] = useState(false);
@@ -19,15 +20,26 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
   const { currentUser } = useAuth();
 
   const handleFileSelect = (files) => {
+    console.log('Files selected:', files);
+    console.log('Current user:', currentUser);
+
     if (!currentUser) {
       onUploadError?.('Please log in to upload files');
       return;
     }
 
+    if (!files || files.length === 0) {
+      onUploadError?.('No files selected');
+      return;
+    }
+
     const fileArray = Array.from(files);
+    console.log('File array:', fileArray);
 
     // Validate files before proceeding
     const validation = FileUploadService.validateFiles(fileArray);
+    console.log('Validation result:', validation);
+
     if (!validation.isValid) {
       onUploadError?.(`File validation failed:\n${validation.errors.join('\n')}`);
       return;
@@ -38,6 +50,13 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
   };
   
   const handleUploadWithMetadata = async () => {
+    console.log('Starting upload with metadata...');
+
+    if (!isFirebaseConfigured) {
+      onUploadError?.('Firebase is not properly configured. Please contact support.');
+      return;
+    }
+
     setUploading(true);
 
     try {
@@ -45,6 +64,9 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
         ...metadata,
         tags: metadata.tags.split(',').map(tag => tag.trim()).filter(Boolean)
       };
+
+      console.log('Upload metadata:', additionalMetadata);
+      console.log('Selected files:', selectedFiles);
 
       const uploadResults = [];
       const uploadErrors = [];
@@ -93,9 +115,18 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
   };
   
   const handleQuickUpload = async () => {
+    console.log('Starting quick upload...');
+
+    if (!isFirebaseConfigured) {
+      onUploadError?.('Firebase is not properly configured. Please contact support.');
+      return;
+    }
+
     setUploading(true);
 
     try {
+      console.log('Selected files for quick upload:', selectedFiles);
+
       const uploadResults = [];
       const uploadErrors = [];
 
@@ -190,7 +221,10 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
             type="file"
             multiple
             style={{ display: 'none' }}
-            onChange={(e) => handleFileSelect(e.target.files)}
+            onChange={(e) => {
+              console.log('File input changed:', e.target.files);
+              handleFileSelect(e.target.files);
+            }}
             accept=".pdf,.docx,.doc,.txt,.rtf,.odt,.xls,.xlsx,.csv,.ods,.ppt,.pptx,.odp,.jpg,.jpeg,.png,.gif,.svg,.bmp,.webp,.dwg,.dxf,.step,.stp,.iges,.igs,.js,.jsx,.ts,.tsx,.py,.java,.cpp,.c,.h,.css,.html,.php,.rb,.go,.rs,.zip,.rar,.7z,.tar,.gz,.md,.json,.xml,.yaml,.yml"
           />
         </>
