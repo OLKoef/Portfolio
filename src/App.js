@@ -19,7 +19,7 @@ function AppContent() {
         <div className="header-content">
           <h1 className="app-title">Student Document Hub</h1>
           <nav className="main-nav">
-            <button 
+            <button
               className={`nav-button ${activeTab === 'portfolio' ? 'active' : ''}`}
               onClick={() => setActiveTab('portfolio')}
             >
@@ -32,17 +32,19 @@ function AppContent() {
               Documents
             </button>
           </nav>
-          <UserProfile />
         </div>
       </header>
 
       <main className="app-main">
+        <div className="user-profile-corner">
+          <UserProfile />
+        </div>
         {activeTab === 'portfolio' && (
           <div className="portfolio-content">
             <BuilderPage urlPath="/" />
           </div>
         )}
-        
+
         {activeTab === 'files' && <FileManager />}
       </main>
 

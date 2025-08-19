@@ -77,6 +77,14 @@ body {
   margin: 0 auto;
   padding: 2rem 1.5rem;
   width: 100%;
+  position: relative;
+}
+
+.user-profile-corner {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 10;
 }
 
 .app-footer {
@@ -251,6 +259,11 @@ body {
   display: flex;
   align-items: center;
   gap: 1rem;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 0.75rem 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
 }
 
 .user-info {
@@ -268,7 +281,7 @@ body {
 }
 
 .avatar-placeholder {
-  background: rgba(255, 255, 255, 0.2);
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -277,7 +290,7 @@ body {
 }
 
 .user-details {
-  color: white;
+  color: #334155;
 }
 
 .user-name {
@@ -287,12 +300,12 @@ body {
 
 .user-email {
   font-size: 0.75rem;
-  opacity: 0.8;
+  opacity: 0.7;
 }
 
 .logout-button {
   padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.1);
+  background: #ef4444;
   color: white;
   border: none;
   border-radius: 0.375rem;
@@ -302,7 +315,7 @@ body {
 }
 
 .logout-button:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: #dc2626;
 }
 
 /* Portfolio Content */
