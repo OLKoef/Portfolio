@@ -3,11 +3,14 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginForm, UserInfo, SignOutButton } from './components/Auth';
 import BuilderContent, { BuilderPage } from './components/BuilderContent';
 import FileManager from './components/FileManager';
+import FileUpload from './components/FileUpload';
 import './App.css';
 
 function AppContent() {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [uploadMessage, setUploadMessage] = useState('');
+  const [messageType, setMessageType] = useState('');
 
   if (!currentUser) {
     return <LoginForm />;
@@ -58,8 +61,24 @@ function AppContent() {
 
         {activeTab === 'dashboard' && (
           <div className="dashboard-content">
-            <h2>Dashboard</h2>
-            <p>Welcome to your dashboard. This is where you can view analytics and manage your content.</p>
+            <h2>Upload Files</h2>
+            {uploadMessage && (
+              <div className={`message ${messageType}`}>
+                {uploadMessage}
+              </div>
+            )}
+            <FileUpload
+              onUploadSuccess={(results) => {
+                setUploadMessage(`Successfully uploaded ${results.length} file(s)`);
+                setMessageType('success');
+                setTimeout(() => setUploadMessage(''), 5000);
+              }}
+              onUploadError={(error) => {
+                setUploadMessage(error);
+                setMessageType('error');
+                setTimeout(() => setUploadMessage(''), 10000);
+              }}
+            />
           </div>
         )}
       </main>
