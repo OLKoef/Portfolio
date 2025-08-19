@@ -31,6 +31,12 @@ function AppContent() {
             >
               Documents
             </button>
+            <button
+              className={`nav-button ${activeTab === 'dashboard' ? 'active' : ''}`}
+              onClick={() => setActiveTab('dashboard')}
+            >
+              Dashboard
+            </button>
           </nav>
           <div className="header-user-actions">
             <SignOutButton />
@@ -49,6 +55,13 @@ function AppContent() {
         )}
 
         {activeTab === 'files' && <FileManager />}
+
+        {activeTab === 'dashboard' && (
+          <div className="dashboard-content">
+            <h2>Dashboard</h2>
+            <p>Welcome to your dashboard. This is where you can view analytics and manage your content.</p>
+          </div>
+        )}
       </main>
 
       <footer className="app-footer">
