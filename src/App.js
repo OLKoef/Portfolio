@@ -17,7 +17,7 @@ function AppContent() {
     <div className="app">
       <header className="app-header">
         <div className="header-content">
-          <h1 className="app-title">Student Document Hub</h1>
+          <h1 className="app-title">BØY</h1>
           <nav className="main-nav">
             <button
               className={`nav-button ${activeTab === 'portfolio' ? 'active' : ''}`}
