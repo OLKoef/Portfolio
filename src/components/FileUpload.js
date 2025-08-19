@@ -169,6 +169,7 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
   const handleDrop = (e) => {
     e.preventDefault();
     setDragOver(false);
+    console.log('Files dropped:', e.dataTransfer.files);
     handleFileSelect(e.dataTransfer.files);
   };
 
@@ -191,7 +192,10 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
             onDrop={handleDrop}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
-            onClick={() => fileInputRef.current?.click()}
+            onClick={() => {
+              console.log('Drop zone clicked, opening file dialog');
+              fileInputRef.current?.click();
+            }}
           >
             {uploading ? (
               <div className="upload-progress">
