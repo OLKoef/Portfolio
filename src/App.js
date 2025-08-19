@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginForm, UserInfo, SignOutButton } from './components/Auth';
 import BuilderContent, { BuilderPage } from './components/BuilderContent';
-import FileManager from './components/FileManager';
 import FileUpload from './components/FileUpload';
 import './App.css';
 
@@ -34,12 +33,6 @@ function AppContent() {
             >
               Portfolio
             </button>
-            <button
-              className={`nav-button ${activeTab === 'files' ? 'active' : ''}`}
-              onClick={() => setActiveTab('files')}
-            >
-              Documents
-            </button>
           </nav>
           <div className="header-user-actions">
             <SignOutButton />
@@ -56,8 +49,6 @@ function AppContent() {
             <BuilderPage urlPath="/" />
           </div>
         )}
-
-        {activeTab === 'files' && <FileManager />}
 
         {activeTab === 'dashboard' && (
           <div className="dashboard-content">
