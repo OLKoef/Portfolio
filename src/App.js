@@ -40,30 +40,6 @@ function AppContent() {
         {activeTab === 'portfolio' && (
           <div className="portfolio-content">
             <BuilderPage urlPath="/" />
-            <div className="fallback-content">
-              <section className="hero-section">
-                <h2>Welcome to Student Document Hub</h2>
-                <p>Your centralized platform for managing engineering projects, course documents, and academic files. Upload, organize, and access your academic work with automatic categorization and tagging.</p>
-              </section>
-              
-              <section className="features-section">
-                <h3>Features</h3>
-                <div className="features-grid">
-                  <div className="feature-card">
-                    <h4>Smart Categorization</h4>
-                    <p>Automatic file categorization by type: Documents, CAD, Code, Images, and more</p>
-                  </div>
-                  <div className="feature-card">
-                    <h4>Enhanced Metadata</h4>
-                    <p>Add course codes, descriptions, tags, and semester information to organize your work</p>
-                  </div>
-                  <div className="feature-card">
-                    <h4>Advanced Search & Filter</h4>
-                    <p>Find files quickly by category, tags, course code, or content search</p>
-                  </div>
-                </div>
-              </section>
-            </div>
           </div>
         )}
         
