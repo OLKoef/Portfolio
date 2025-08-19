@@ -1,12 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { FileUploadService } from '../services/fileUpload';
+import { isFirebaseConfigured } from '../firebase/config';
 
 export default function FileUpload({ onUploadSuccess, onUploadError }) {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [showMetadataForm, setShowMetadataForm] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
+  const [showSuccess, setShowSuccess] = useState(false);
   const [metadata, setMetadata] = useState({
     description: '',
     semester: '',
@@ -23,10 +25,16 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
       return;
     }
 
+    if (!files || files.length === 0) {
+      onUploadError?.('No files selected');
+      return;
+    }
+
     const fileArray = Array.from(files);
 
     // Validate files before proceeding
     const validation = FileUploadService.validateFiles(fileArray);
+
     if (!validation.isValid) {
       onUploadError?.(`File validation failed:\n${validation.errors.join('\n')}`);
       return;
@@ -37,6 +45,11 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
   };
   
   const handleUploadWithMetadata = async () => {
+    if (!isFirebaseConfigured) {
+      onUploadError?.('Firebase is not properly configured. Please contact support.');
+      return;
+    }
+
     setUploading(true);
 
     try {
@@ -60,6 +73,14 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
 
       if (uploadResults.length > 0) {
         onUploadSuccess?.(uploadResults);
+
+        // Show success state
+        setShowSuccess(true);
+
+        // Reset after 2 seconds
+        setTimeout(() => {
+          setShowSuccess(false);
+        }, 2000);
       }
 
       if (uploadErrors.length > 0) {
@@ -84,6 +105,11 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
   };
   
   const handleQuickUpload = async () => {
+    if (!isFirebaseConfigured) {
+      onUploadError?.('Firebase is not properly configured. Please contact support.');
+      return;
+    }
+
     setUploading(true);
 
     try {
@@ -102,6 +128,14 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
 
       if (uploadResults.length > 0) {
         onUploadSuccess?.(uploadResults);
+
+        // Show success state
+        setShowSuccess(true);
+
+        // Reset after 2 seconds
+        setTimeout(() => {
+          setShowSuccess(false);
+        }, 2000);
       }
 
       if (uploadErrors.length > 0) {
@@ -149,6 +183,13 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
               <div className="upload-progress">
                 <div className="spinner"></div>
                 <p>Uploading files...</p>
+              </div>
+            ) : showSuccess ? (
+              <div className="upload-success">
+                <svg className="success-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <p>Upload successful!</p>
               </div>
             ) : (
               <div className="upload-prompt">

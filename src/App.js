@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { LoginForm, UserProfile } from './components/Auth';
+import { LoginForm, UserInfo, SignOutButton } from './components/Auth';
 import BuilderContent, { BuilderPage } from './components/BuilderContent';
-import FileManager from './components/FileManager';
+import FileUpload from './components/FileUpload';
 import './App.css';
 
 function AppContent() {
   const { currentUser } = useAuth();
-  const [activeTab, setActiveTab] = useState('portfolio');
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [uploadMessage, setUploadMessage] = useState('');
+  const [messageType, setMessageType] = useState('');
 
   if (!currentUser) {
     return <LoginForm />;
@@ -17,57 +19,72 @@ function AppContent() {
     <div className="app">
       <header className="app-header">
         <div className="header-content">
-          <h1 className="app-title">Student Document Hub</h1>
+          <h1 className="app-title">BØY</h1>
           <nav className="main-nav">
-            <button 
+            <button
+              className={`nav-button ${activeTab === 'dashboard' ? 'active' : ''}`}
+              onClick={() => setActiveTab('dashboard')}
+            >
+              Dashboard
+            </button>
+            <button
               className={`nav-button ${activeTab === 'portfolio' ? 'active' : ''}`}
               onClick={() => setActiveTab('portfolio')}
             >
               Portfolio
             </button>
             <button
-              className={`nav-button ${activeTab === 'files' ? 'active' : ''}`}
-              onClick={() => setActiveTab('files')}
+              className={`nav-button ${activeTab === 'tools' ? 'active' : ''}`}
+              onClick={() => setActiveTab('tools')}
             >
-              Documents
+              Tools
             </button>
           </nav>
-          <UserProfile />
+          <div className="header-user-actions">
+            <SignOutButton />
+          </div>
         </div>
       </header>
 
       <main className="app-main">
+        <div className="user-profile-corner">
+          <UserInfo />
+        </div>
         {activeTab === 'portfolio' && (
           <div className="portfolio-content">
             <BuilderPage urlPath="/" />
-            <div className="fallback-content">
-              <section className="hero-section">
-                <h2>Welcome to Student Document Hub</h2>
-                <p>Your centralized platform for managing engineering projects, course documents, and academic files. Upload, organize, and access your academic work with automatic categorization and tagging.</p>
-              </section>
-              
-              <section className="features-section">
-                <h3>Features</h3>
-                <div className="features-grid">
-                  <div className="feature-card">
-                    <h4>Smart Categorization</h4>
-                    <p>Automatic file categorization by type: Documents, CAD, Code, Images, and more</p>
-                  </div>
-                  <div className="feature-card">
-                    <h4>Enhanced Metadata</h4>
-                    <p>Add course codes, descriptions, tags, and semester information to organize your work</p>
-                  </div>
-                  <div className="feature-card">
-                    <h4>Advanced Search & Filter</h4>
-                    <p>Find files quickly by category, tags, course code, or content search</p>
-                  </div>
-                </div>
-              </section>
-            </div>
           </div>
         )}
-        
-        {activeTab === 'files' && <FileManager />}
+
+        {activeTab === 'tools' && (
+          <div className="tools-content">
+            <h2>Tools</h2>
+            <p>Access various tools and utilities for your projects.</p>
+          </div>
+        )}
+
+        {activeTab === 'dashboard' && (
+          <div className="dashboard-content">
+            <h2>Upload Files</h2>
+            {uploadMessage && (
+              <div className={`message ${messageType}`}>
+                {uploadMessage}
+              </div>
+            )}
+            <FileUpload
+              onUploadSuccess={(results) => {
+                setUploadMessage(`Successfully uploaded ${results.length} file(s)`);
+                setMessageType('success');
+                setTimeout(() => setUploadMessage(''), 5000);
+              }}
+              onUploadError={(error) => {
+                setUploadMessage(error);
+                setMessageType('error');
+                setTimeout(() => setUploadMessage(''), 10000);
+              }}
+            />
+          </div>
+        )}
       </main>
 
       <footer className="app-footer">
