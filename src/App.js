@@ -33,6 +33,12 @@ function AppContent() {
             >
               Portfolio
             </button>
+            <button
+              className={`nav-button ${activeTab === 'tools' ? 'active' : ''}`}
+              onClick={() => setActiveTab('tools')}
+            >
+              Tools
+            </button>
           </nav>
           <div className="header-user-actions">
             <SignOutButton />
@@ -47,6 +53,13 @@ function AppContent() {
         {activeTab === 'portfolio' && (
           <div className="portfolio-content">
             <BuilderPage urlPath="/" />
+          </div>
+        )}
+
+        {activeTab === 'tools' && (
+          <div className="tools-content">
+            <h2>Tools</h2>
+            <p>Access various tools and utilities for your projects.</p>
           </div>
         )}
 
