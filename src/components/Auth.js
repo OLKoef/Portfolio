@@ -131,9 +131,49 @@ export function LoginForm() {
   );
 }
 
+export function UserInfo() {
+  const { currentUser } = useAuth();
+
+  return (
+    <div className="user-info-card">
+      <div className="user-avatar">
+        {currentUser.photoURL ? (
+          <img src={currentUser.photoURL} alt="Profile" />
+        ) : (
+          <div className="avatar-placeholder">
+            {currentUser.email?.[0]?.toUpperCase()}
+          </div>
+        )}
+      </div>
+      <div className="user-details">
+        <p className="user-name">{currentUser.displayName || 'User'}</p>
+        <p className="user-email">{currentUser.email}</p>
+      </div>
+    </div>
+  );
+}
+
+export function SignOutButton() {
+  const { logout } = useAuth();
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Failed to logout:', error);
+    }
+  };
+
+  return (
+    <button onClick={handleLogout} className="header-logout-button">
+      Sign Out
+    </button>
+  );
+}
+
 export function UserProfile() {
   const { currentUser, logout } = useAuth();
-  
+
   const handleLogout = async () => {
     try {
       await logout();

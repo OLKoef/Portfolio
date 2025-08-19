@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
-import { LoginForm, UserProfile } from './components/Auth';
+import { LoginForm, UserInfo, SignOutButton } from './components/Auth';
 import BuilderContent, { BuilderPage } from './components/BuilderContent';
 import FileManager from './components/FileManager';
 import './App.css';
@@ -32,12 +32,15 @@ function AppContent() {
               Documents
             </button>
           </nav>
+          <div className="header-user-actions">
+            <SignOutButton />
+          </div>
         </div>
       </header>
 
       <main className="app-main">
         <div className="user-profile-corner">
-          <UserProfile />
+          <UserInfo />
         </div>
         {activeTab === 'portfolio' && (
           <div className="portfolio-content">
