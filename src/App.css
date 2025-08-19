@@ -96,6 +96,7 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1.5rem;
+  padding-top: 5rem;
   width: 100%;
   position: relative;
 }
@@ -352,6 +353,12 @@ body {
 /* Portfolio Content */
 .portfolio-content {
   min-height: 400px;
+}
+
+/* Dashboard Content */
+.dashboard-content h2 {
+  margin-top: 0;
+  margin-bottom: 1.5rem;
 }
 
 .fallback-content {
