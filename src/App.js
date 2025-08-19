@@ -7,7 +7,7 @@ import './App.css';
 
 function AppContent() {
   const { currentUser } = useAuth();
-  const [activeTab, setActiveTab] = useState('portfolio');
+  const [activeTab, setActiveTab] = useState('dashboard');
 
   if (!currentUser) {
     return <LoginForm />;
@@ -20,6 +20,12 @@ function AppContent() {
           <h1 className="app-title">BØY</h1>
           <nav className="main-nav">
             <button
+              className={`nav-button ${activeTab === 'dashboard' ? 'active' : ''}`}
+              onClick={() => setActiveTab('dashboard')}
+            >
+              Dashboard
+            </button>
+            <button
               className={`nav-button ${activeTab === 'portfolio' ? 'active' : ''}`}
               onClick={() => setActiveTab('portfolio')}
             >
@@ -30,12 +36,6 @@ function AppContent() {
               onClick={() => setActiveTab('files')}
             >
               Documents
-            </button>
-            <button
-              className={`nav-button ${activeTab === 'dashboard' ? 'active' : ''}`}
-              onClick={() => setActiveTab('dashboard')}
-            >
-              Dashboard
             </button>
           </nav>
           <div className="header-user-actions">
