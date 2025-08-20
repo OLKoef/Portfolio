@@ -72,6 +72,20 @@ function AppContent() {
                 {uploadMessage}
               </div>
             )}
+
+            <FileUploadDebug
+              onUploadSuccess={(results) => {
+                setUploadMessage(`🎉 DEBUG: Successfully uploaded ${results.length} file(s)!`);
+                setMessageType('success');
+                setTimeout(() => setUploadMessage(''), 8000);
+              }}
+              onUploadError={(error) => {
+                setUploadMessage(`❌ DEBUG: ${error}`);
+                setMessageType('error');
+                setTimeout(() => setUploadMessage(''), 10000);
+              }}
+            />
+
             <FileUpload
               onUploadSuccess={(results) => {
                 setUploadMessage(`🎉 Vellykket opplasting! ${results.length} fil(er) er nå lagret sikkert og tilgjengelig i systemet. Du kan finne filene dine i filbehandleren.`);
