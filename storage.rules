@@ -1,0 +1,77 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    // Norwegian file storage architecture security rules
+    
+    // Private user files: user/{uid}/{fileId}
+    match /user/{userId}/{fileId} {
+      // Only authenticated users can access their own files
+      allow read, write, delete: if request.auth != null 
+                                && request.auth.uid == userId;
+      
+      // File upload validation
+      allow create: if request.auth != null 
+                   && request.auth.uid == userId
+                   && validateFile(request.resource);
+    }
+    
+    // Organization files: org/{orgId}/users/{uid}/{fileId}
+    match /org/{orgId}/users/{userId}/{fileId} {
+      // Only organization members can access these files
+      allow read: if request.auth != null 
+                 && (request.auth.uid == userId || isOrgMember(request.auth.uid, orgId));
+      
+      allow write, delete: if request.auth != null 
+                          && request.auth.uid == userId
+                          && isOrgMember(request.auth.uid, orgId);
+      
+      // File upload validation for organization files
+      allow create: if request.auth != null 
+                   && request.auth.uid == userId
+                   && isOrgMember(request.auth.uid, orgId)
+                   && validateFile(request.resource);
+    }
+    
+    // Function to validate file uploads according to Norwegian specs
+    function validateFile(resource) {
+      // Check file size (max 200MB)
+      let maxSize = 200 * 1024 * 1024;
+      let validSize = resource.size <= maxSize && resource.size > 0;
+      
+      // Allowed file types for Norwegian education
+      let allowedTypes = [
+        'application/pdf',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'image/png',
+        'image/jpeg',
+        'image/jpg'
+      ];
+      
+      // MIME type validation
+      let validMimeType = resource.contentType in allowedTypes ||
+                         resource.contentType.matches('application/(dwg|dxf)') ||
+                         resource.contentType.matches('image/vnd\\.(dwg|dxf)');
+      
+      // Filename validation (no dangerous characters)
+      let safeFilename = !resource.name.matches('.*[<>:"/\\\\|?*].*');
+      
+      // File name length validation
+      let validLength = resource.name.size() <= 255 && resource.name.size() > 0;
+      
+      return validSize && validMimeType && safeFilename && validLength;
+    }
+    
+    // Function to check organization membership (simplified)
+    function isOrgMember(uid, orgId) {
+      // This checks if the member document exists in Firestore
+      return exists(/databases/(default)/documents/organizations/$(orgId)/members/$(uid));
+    }
+    
+    // Deny all other access
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

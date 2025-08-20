@@ -1,42 +1,46 @@
 import React, { useState, useRef } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { FileUploadService } from '../services/fileUpload';
+import { OrganizationService } from '../services/organizationService';
 import { isFirebaseConfigured } from '../firebase/config';
 
-export default function FileUpload({ onUploadSuccess, onUploadError }) {
+export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg = null }) {
   const [uploading, setUploading] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [showMetadataForm, setShowMetadataForm] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [metadata, setMetadata] = useState({
     description: '',
     semester: '',
     subject: '',
+    courseCode: '',
+    assignmentType: '',
     tags: '',
-    isPublic: false
+    visibility: selectedOrg ? 'org' : 'private'
   });
   const fileInputRef = useRef();
   const { currentUser } = useAuth();
 
   const handleFileSelect = (files) => {
     if (!currentUser) {
-      onUploadError?.('Please log in to upload files');
+      onUploadError?.('Vennligst logg inn for å laste opp filer');
       return;
     }
 
     if (!files || files.length === 0) {
-      onUploadError?.('No files selected');
+      onUploadError?.('Ingen filer valgt');
       return;
     }
 
     const fileArray = Array.from(files);
 
-    // Validate files before proceeding
+    // Validate files using Norwegian specifications
     const validation = FileUploadService.validateFiles(fileArray);
 
     if (!validation.isValid) {
-      onUploadError?.(`File validation failed:\n${validation.errors.join('\n')}`);
+      onUploadError?.(`Filvalidering feilet:\n${validation.errors.join('\n')}`);
       return;
     }
 
@@ -46,11 +50,12 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
   
   const handleUploadWithMetadata = async () => {
     if (!isFirebaseConfigured) {
-      onUploadError?.('Firebase is not properly configured. Please contact support.');
+      onUploadError?.('Firebase er ikke konfigurert riktig. Kontakt support.');
       return;
     }
 
     setUploading(true);
+    setUploadProgress(0);
 
     try {
       const additionalMetadata = {
@@ -61,95 +66,116 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
       const uploadResults = [];
       const uploadErrors = [];
 
-      // Upload files one by one to handle individual errors
-      for (const file of selectedFiles) {
+      // Upload files one by one with progress tracking
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
         try {
-          const result = await FileUploadService.uploadFile(file, currentUser.uid, 'uploads', additionalMetadata);
+          // Update progress
+          setUploadProgress(Math.round((i / selectedFiles.length) * 100));
+          
+          const result = await FileUploadService.uploadFile(
+            file, 
+            currentUser.uid, 
+            selectedOrg?.id || null,
+            additionalMetadata
+          );
           uploadResults.push(result);
         } catch (error) {
           uploadErrors.push(`${file.name}: ${error.message}`);
         }
       }
 
+      setUploadProgress(100);
+
       if (uploadResults.length > 0) {
         onUploadSuccess?.(uploadResults);
 
         // Show success state
         setShowSuccess(true);
-
-        // Reset after 2 seconds
         setTimeout(() => {
           setShowSuccess(false);
-        }, 2000);
+        }, 3000);
       }
 
       if (uploadErrors.length > 0) {
-        onUploadError?.(`Some files failed to upload:\n${uploadErrors.join('\n')}`);
+        onUploadError?.(`Noen filer kunne ikke lastes opp:\n${uploadErrors.join('\n')}`);
       }
 
       // Reset form
-      setSelectedFiles([]);
-      setShowMetadataForm(false);
-      setMetadata({
-        description: '',
-        semester: '',
-        subject: '',
-        tags: '',
-        isPublic: false
-      });
+      resetForm();
     } catch (error) {
       onUploadError?.(error.message);
     } finally {
       setUploading(false);
+      setUploadProgress(0);
     }
   };
   
   const handleQuickUpload = async () => {
     if (!isFirebaseConfigured) {
-      onUploadError?.('Firebase is not properly configured. Please contact support.');
+      onUploadError?.('Firebase er ikke konfigurert riktig. Kontakt support.');
       return;
     }
 
     setUploading(true);
+    setUploadProgress(0);
 
     try {
       const uploadResults = [];
       const uploadErrors = [];
 
-      // Upload files one by one to handle individual errors
-      for (const file of selectedFiles) {
+      // Upload files with auto-categorization
+      for (let i = 0; i < selectedFiles.length; i++) {
+        const file = selectedFiles[i];
         try {
-          const result = await FileUploadService.uploadFile(file, currentUser.uid);
+          setUploadProgress(Math.round((i / selectedFiles.length) * 100));
+          
+          const result = await FileUploadService.uploadFile(
+            file, 
+            currentUser.uid,
+            selectedOrg?.id || null
+          );
           uploadResults.push(result);
         } catch (error) {
           uploadErrors.push(`${file.name}: ${error.message}`);
         }
       }
 
+      setUploadProgress(100);
+
       if (uploadResults.length > 0) {
         onUploadSuccess?.(uploadResults);
-
-        // Show success state
         setShowSuccess(true);
-
-        // Reset after 2 seconds
         setTimeout(() => {
           setShowSuccess(false);
-        }, 2000);
+        }, 3000);
       }
 
       if (uploadErrors.length > 0) {
-        onUploadError?.(`Some files failed to upload:\n${uploadErrors.join('\n')}`);
+        onUploadError?.(`Noen filer kunne ikke lastes opp:\n${uploadErrors.join('\n')}`);
       }
 
-      // Reset form
-      setSelectedFiles([]);
-      setShowMetadataForm(false);
+      resetForm();
     } catch (error) {
       onUploadError?.(error.message);
     } finally {
       setUploading(false);
+      setUploadProgress(0);
     }
+  };
+
+  const resetForm = () => {
+    setSelectedFiles([]);
+    setShowMetadataForm(false);
+    setMetadata({
+      description: '',
+      semester: '',
+      subject: '',
+      courseCode: '',
+      assignmentType: '',
+      tags: '',
+      visibility: selectedOrg ? 'org' : 'private'
+    });
   };
 
   const handleDrop = (e) => {
@@ -168,8 +194,26 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
     setDragOver(false);
   };
 
+  const formatFileSize = (bytes) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
   return (
     <div className="file-upload-container">
+      {/* Upload destination indicator */}
+      {selectedOrg && (
+        <div className="upload-destination">
+          <svg className="destination-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+          </svg>
+          <span>Laster opp til: <strong>{selectedOrg.name}</strong></span>
+        </div>
+      )}
+
       {!showMetadataForm ? (
         <>
           <div
@@ -181,23 +225,54 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
           >
             {uploading ? (
               <div className="upload-progress">
-                <div className="spinner"></div>
-                <p>Uploading files...</p>
+                <div className="progress-circle">
+                  <div className="progress-ring">
+                    <svg className="progress-svg" viewBox="0 0 120 120">
+                      <circle
+                        cx="60"
+                        cy="60"
+                        r="50"
+                        fill="none"
+                        stroke="#e0e0e0"
+                        strokeWidth="8"
+                      />
+                      <circle
+                        cx="60"
+                        cy="60"
+                        r="50"
+                        fill="none"
+                        stroke="#2563eb"
+                        strokeWidth="8"
+                        strokeLinecap="round"
+                        strokeDasharray={`${2 * Math.PI * 50}`}
+                        strokeDashoffset={`${2 * Math.PI * 50 * (1 - uploadProgress / 100)}`}
+                        transform="rotate(-90 60 60)"
+                      />
+                    </svg>
+                    <div className="progress-text">{uploadProgress}%</div>
+                  </div>
+                </div>
+                <p>Laster opp filer...</p>
+                <p className="upload-subtitle">Norwegian GDPR-compliant lagring</p>
               </div>
             ) : showSuccess ? (
               <div className="upload-success">
                 <svg className="success-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
-                <p>Upload successful!</p>
+                <p>Opplasting vellykket!</p>
+                <p className="success-subtitle">Filer lagret sikkert i EU</p>
               </div>
             ) : (
               <div className="upload-prompt">
                 <svg className="upload-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
-                <p>Drop files here or click to browse</p>
-                <p className="upload-hint">Supports PDF, DOCX, CAD, images, and code files</p>
+                <p>Slipp filer her eller klikk for å bla gjennom</p>
+                <p className="upload-hint">
+                  Støtter: PDF, DOCX, XLSX, PNG, JPG, DWG, DXF
+                </p>
+                <p className="upload-limit">Maks 200MB per fil • GDPR-kompatibel lagring</p>
               </div>
             )}
           </div>
@@ -208,22 +283,30 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
             multiple
             style={{ display: 'none' }}
             onChange={(e) => handleFileSelect(e.target.files)}
-            accept=".pdf,.docx,.doc,.txt,.rtf,.odt,.xls,.xlsx,.csv,.ods,.ppt,.pptx,.odp,.jpg,.jpeg,.png,.gif,.svg,.bmp,.webp,.dwg,.dxf,.step,.stp,.iges,.igs,.js,.jsx,.ts,.tsx,.py,.java,.cpp,.c,.h,.css,.html,.php,.rb,.go,.rs,.zip,.rar,.7z,.tar,.gz,.md,.json,.xml,.yaml,.yml"
+            accept=".pdf,.docx,.xlsx,.png,.jpg,.jpeg,.dwg,.dxf"
           />
         </>
       ) : (
         <div className="metadata-form">
-          <h3>Add File Details (Optional)</h3>
-          <p className="selected-files-info">
-            Selected {selectedFiles.length} file(s): {selectedFiles.map(f => f.name).join(', ')}
-          </p>
+          <h3>Legg til fildetaljer</h3>
+          <div className="selected-files-summary">
+            <p><strong>{selectedFiles.length} fil(er) valgt:</strong></p>
+            <div className="files-list">
+              {selectedFiles.map((file, index) => (
+                <div key={index} className="file-summary">
+                  <span className="file-name">{file.name}</span>
+                  <span className="file-size">({formatFileSize(file.size)})</span>
+                </div>
+              ))}
+            </div>
+          </div>
           
           <div className="metadata-grid">
             <div className="form-group">
-              <label htmlFor="description">Description</label>
+              <label htmlFor="description">Beskrivelse</label>
               <textarea
                 id="description"
-                placeholder="Brief description of the files..."
+                placeholder="Kort beskrivelse av filene..."
                 value={metadata.description}
                 onChange={(e) => setMetadata(prev => ({ ...prev, description: e.target.value }))}
                 className="form-textarea"
@@ -233,51 +316,77 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
             
             <div className="form-row">
               <div className="form-group">
-                <label htmlFor="semester">Semester</label>
+                <label htmlFor="courseCode">Emnekode</label>
                 <input
-                  id="semester"
+                  id="courseCode"
                   type="text"
-                  placeholder="e.g., Fall 2024"
-                  value={metadata.semester}
-                  onChange={(e) => setMetadata(prev => ({ ...prev, semester: e.target.value }))}
+                  placeholder="f.eks. TKT4140"
+                  value={metadata.courseCode}
+                  onChange={(e) => setMetadata(prev => ({ ...prev, courseCode: e.target.value.toUpperCase() }))}
                   className="form-input"
+                  pattern="[A-Z]{2,5}[0-9]{3,4}"
                 />
               </div>
               
               <div className="form-group">
-                <label htmlFor="subject">Subject/Course</label>
+                <label htmlFor="semester">Semester</label>
+                <select
+                  id="semester"
+                  value={metadata.semester}
+                  onChange={(e) => setMetadata(prev => ({ ...prev, semester: e.target.value }))}
+                  className="form-select"
+                >
+                  <option value="">Velg semester</option>
+                  <option value="H24">Høst 2024</option>
+                  <option value="V25">Vår 2025</option>
+                  <option value="H25">Høst 2025</option>
+                  <option value="V26">Vår 2026</option>
+                </select>
+              </div>
+            </div>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label htmlFor="subject">Fag/Emne</label>
                 <input
                   id="subject"
                   type="text"
-                  placeholder="e.g., Structural Engineering"
+                  placeholder="f.eks. Konstruksjonsteknikk"
                   value={metadata.subject}
                   onChange={(e) => setMetadata(prev => ({ ...prev, subject: e.target.value }))}
                   className="form-input"
                 />
               </div>
+              
+              <div className="form-group">
+                <label htmlFor="assignmentType">Type oppgave</label>
+                <select
+                  id="assignmentType"
+                  value={metadata.assignmentType}
+                  onChange={(e) => setMetadata(prev => ({ ...prev, assignmentType: e.target.value }))}
+                  className="form-select"
+                >
+                  <option value="">Velg type</option>
+                  <option value="øving">Øving</option>
+                  <option value="oppgave">Oppgave</option>
+                  <option value="prosjekt">Prosjekt</option>
+                  <option value="rapport">Rapport</option>
+                  <option value="eksamen">Eksamen</option>
+                  <option value="presentasjon">Presentasjon</option>
+                </select>
+              </div>
             </div>
             
             <div className="form-group">
-              <label htmlFor="tags">Tags (comma-separated)</label>
+              <label htmlFor="tags">Stikkord (kommaseparert)</label>
               <input
                 id="tags"
                 type="text"
-                placeholder="e.g., homework, project, final-exam"
+                placeholder="f.eks. hjemmeoppgave, gruppe, teoretisk"
                 value={metadata.tags}
                 onChange={(e) => setMetadata(prev => ({ ...prev, tags: e.target.value }))}
                 className="form-input"
               />
-            </div>
-            
-            <div className="form-group checkbox-group">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={metadata.isPublic}
-                  onChange={(e) => setMetadata(prev => ({ ...prev, isPublic: e.target.checked }))}
-                />
-                <span>Make files publicly accessible</span>
-              </label>
             </div>
           </div>
           
@@ -288,7 +397,7 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
               className="upload-button quick"
               disabled={uploading}
             >
-              Quick Upload (Auto-categorize)
+              Hurtigopplasting
             </button>
             <button 
               type="button" 
@@ -296,19 +405,23 @@ export default function FileUpload({ onUploadSuccess, onUploadError }) {
               className="upload-button detailed"
               disabled={uploading}
             >
-              Upload with Details
+              Last opp med detaljer
             </button>
             <button 
               type="button" 
-              onClick={() => {
-                setShowMetadataForm(false);
-                setSelectedFiles([]);
-              }}
+              onClick={resetForm}
               className="upload-button cancel"
               disabled={uploading}
             >
-              Cancel
+              Avbryt
             </button>
+          </div>
+          
+          <div className="compliance-notice">
+            <svg className="shield-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <span>GDPR-kompatibel lagring i EU • Norsk personvernlovgivning</span>
           </div>
         </div>
       )}
