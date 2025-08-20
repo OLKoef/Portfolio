@@ -1,53 +1,70 @@
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { collection, addDoc, deleteDoc, doc, getDocs, query, where, updateDoc } from 'firebase/firestore';
+import { ref, uploadBytes, getDownloadURL, deleteObject, uploadBytesResumable } from 'firebase/storage';
+import { collection, addDoc, deleteDoc, doc, getDocs, query, where, updateDoc, setDoc, getDoc } from 'firebase/firestore';
+import { getFunctions, httpsCallable } from 'firebase/functions';
 import { storage, db } from '../firebase/config';
 
 export class FileUploadService {
 
-  // File validation constants
-  static MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB
+  // File validation constants - updated for Norwegian education requirements
+  static MAX_FILE_SIZE = 200 * 1024 * 1024; // 200MB max
+  static MIN_FILE_SIZE = 50 * 1024 * 1024;  // 50MB minimum for large file handling
+  
+  // Restricted file types according to Norwegian specifications
   static ALLOWED_EXTENSIONS = [
-    // Documents
-    'pdf', 'doc', 'docx', 'txt', 'rtf', 'odt',
-    // Spreadsheets
-    'xls', 'xlsx', 'csv', 'ods',
-    // Presentations
-    'ppt', 'pptx', 'odp',
-    // Images
-    'jpg', 'jpeg', 'png', 'gif', 'svg', 'bmp', 'webp',
-    // CAD files
-    'dwg', 'dxf', 'step', 'stp', 'iges', 'igs',
-    // Code files
-    'js', 'jsx', 'ts', 'tsx', 'py', 'java', 'cpp', 'c', 'h', 'css', 'html', 'php', 'rb', 'go', 'rs',
-    // Archives
-    'zip', 'rar', '7z', 'tar', 'gz',
-    // Others
-    'md', 'json', 'xml', 'yaml', 'yml'
+    // Documents (PDF, Office docs)
+    'pdf', 'docx', 'xlsx',
+    // Images (PNG/JPG as specified)
+    'png', 'jpg', 'jpeg',
+    // CAD files (DWG/DXF as specified)
+    'dwg', 'dxf'
   ];
 
-  // Validate file before upload
+  static ALLOWED_MIME_TYPES = [
+    'application/pdf',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'image/png',
+    'image/jpeg',
+    'image/jpg',
+    'application/dwg',
+    'application/dxf',
+    'image/vnd.dwg',
+    'image/vnd.dxf'
+  ];
+
+  // Validate file according to Norwegian specs
   static validateFile(file) {
     const errors = [];
 
-    // Check file size
+    // Check file size (50-200MB range)
     if (file.size > this.MAX_FILE_SIZE) {
-      errors.push(`File size exceeds ${this.MAX_FILE_SIZE / (1024 * 1024)}MB limit`);
+      errors.push(`Filstørrelsen overstiger ${this.MAX_FILE_SIZE / (1024 * 1024)}MB grensen`);
     }
 
-    // Check file extension
+    if (file.size === 0) {
+      errors.push('Kan ikke laste opp tomme filer');
+    }
+
+    // Check file extension (stricter validation)
     const extension = file.name.split('.').pop().toLowerCase();
     if (!this.ALLOWED_EXTENSIONS.includes(extension)) {
-      errors.push(`File type '.${extension}' is not supported`);
+      errors.push(`Filtype '.${extension}' er ikke støttet. Tillatt: ${this.ALLOWED_EXTENSIONS.join(', ')}`);
     }
 
-    // Check filename length
+    // Check MIME type for additional security
+    if (!this.ALLOWED_MIME_TYPES.includes(file.type)) {
+      errors.push(`MIME-type '${file.type}' er ikke tillatt`);
+    }
+
+    // Check filename length and characters
     if (file.name.length > 255) {
-      errors.push('Filename is too long (max 255 characters)');
+      errors.push('Filnavn er for langt (maks 255 tegn)');
     }
 
-    // Check for empty files
-    if (file.size === 0) {
-      errors.push('Cannot upload empty files');
+    // Norwegian character validation
+    const invalidChars = /[<>:"/\\|?*]/;
+    if (invalidChars.test(file.name)) {
+      errors.push('Filnavn inneholder ugyldige tegn');
     }
 
     return {
@@ -67,12 +84,12 @@ export class FileUploadService {
       totalSize += file.size;
     }
 
-    // Check total upload size (500MB limit for batch)
-    const MAX_TOTAL_SIZE = 500 * 1024 * 1024;
+    // Total upload limit for batch
+    const MAX_TOTAL_SIZE = 500 * 1024 * 1024; // 500MB
     if (totalSize > MAX_TOTAL_SIZE) {
       return {
         isValid: false,
-        errors: [`Total upload size exceeds ${MAX_TOTAL_SIZE / (1024 * 1024)}MB limit`],
+        errors: [`Total opplastingsstørrelse overstiger ${MAX_TOTAL_SIZE / (1024 * 1024)}MB grensen`],
         fileResults: results
       };
     }
@@ -87,175 +104,291 @@ export class FileUploadService {
     };
   }
 
-  // File categorization based on type and extension
+  // Generate storage path according to Norwegian architecture
+  static generateStoragePath(userId, fileId, orgId = null) {
+    if (orgId) {
+      // Organization files: org/{orgId}/users/{uid}/{fileId}
+      return `org/${orgId}/users/${userId}/${fileId}`;
+    } else {
+      // Private files: user/{uid}/{fileId}
+      return `user/${userId}/${fileId}`;
+    }
+  }
+
+  // Enhanced file categorization for Norwegian education
   static categorizeFile(file) {
     const extension = file.name.split('.').pop().toLowerCase();
     const type = file.type.toLowerCase();
 
-    if (type.startsWith('image/')) {
-      return { category: 'Images', tags: ['media', 'visual'] };
+    if (['png', 'jpg', 'jpeg'].includes(extension)) {
+      return { 
+        category: 'Bilder', 
+        tags: ['bilde', 'media'],
+        subcategory: 'Dokumentbilder'
+      };
     }
 
-    if (extension === 'pdf' || type.includes('pdf')) {
-      return { category: 'Documents', tags: ['document', 'report'] };
+    if (extension === 'pdf') {
+      return { 
+        category: 'Dokumenter', 
+        tags: ['dokument', 'rapport', 'pdf'],
+        subcategory: 'PDF-dokumenter'
+      };
     }
 
-    if (extension === 'dwg' || extension === 'dxf' || extension === 'step' || extension === 'iges') {
-      return { category: 'CAD', tags: ['engineering', 'design', 'technical'] };
+    if (['dwg', 'dxf'].includes(extension)) {
+      return { 
+        category: 'CAD', 
+        tags: ['ingeniørarbeid', 'design', 'teknisk', 'cad'],
+        subcategory: 'CAD-tegninger'
+      };
     }
 
-    if (type.includes('word') || type.includes('document') || extension === 'docx' || extension === 'doc') {
-      return { category: 'Documents', tags: ['document', 'text'] };
+    if (extension === 'docx') {
+      return { 
+        category: 'Dokumenter', 
+        tags: ['dokument', 'tekst', 'word'],
+        subcategory: 'Word-dokumenter'
+      };
     }
 
-    if (type.includes('spreadsheet') || extension === 'xlsx' || extension === 'xls' || extension === 'csv') {
-      return { category: 'Spreadsheets', tags: ['data', 'calculation'] };
+    if (extension === 'xlsx') {
+      return { 
+        category: 'Regneark', 
+        tags: ['data', 'beregning', 'excel'],
+        subcategory: 'Excel-regneark'
+      };
     }
 
-    if (type.includes('presentation') || extension === 'pptx' || extension === 'ppt') {
-      return { category: 'Presentations', tags: ['presentation', 'slides'] };
-    }
-
-    if (['js', 'jsx', 'ts', 'tsx', 'py', 'java', 'cpp', 'c', 'html', 'css'].includes(extension)) {
-      return { category: 'Code', tags: ['programming', 'source-code'] };
-    }
-
-    if (['txt', 'md', 'readme'].includes(extension)) {
-      return { category: 'Notes', tags: ['text', 'documentation'] };
-    }
-
-    if (['zip', 'rar', '7z', 'tar'].includes(extension)) {
-      return { category: 'Archives', tags: ['compressed', 'archive'] };
-    }
-
-    return { category: 'Other', tags: ['misc'] };
+    return { 
+      category: 'Annet', 
+      tags: ['diverse'],
+      subcategory: 'Ukategorisert'
+    };
   }
 
-  // Extract potential course codes from filename
+  // Extract Norwegian course codes and semester info
   static extractCourseInfo(filename) {
-    // Common Norwegian/International course code patterns
-    const courseCodePattern = /([A-Z]{2,4}[0-9]{3,4})/g;
-    const matches = filename.match(courseCodePattern);
-    return matches ? matches[0] : null;
+    const norwegianPatterns = {
+      // Norwegian university course codes (e.g., TKT4140, BYGG2020)
+      courseCode: /([A-Z]{2,5}[0-9]{3,4})/g,
+      // Semester patterns (H24, V24, Høst2024, Vår2024)
+      semester: /(H|V|Høst|Vår)\s*20[2-9][0-9]/gi,
+      // Assignment patterns
+      assignment: /(øving|oppgave|eksamen|prosjekt|rapport)\s*[0-9]*/gi
+    };
+
+    const courseMatch = filename.match(norwegianPatterns.courseCode);
+    const semesterMatch = filename.match(norwegianPatterns.semester);
+    const assignmentMatch = filename.match(norwegianPatterns.assignment);
+
+    return {
+      courseCode: courseMatch ? courseMatch[0] : null,
+      semester: semesterMatch ? semesterMatch[0] : null,
+      assignmentType: assignmentMatch ? assignmentMatch[0] : null
+    };
   }
-  
-  static async uploadFile(file, userId, folder = 'uploads', additionalMetadata = {}) {
+
+  // Check if user is member of organization
+  static async checkOrgMembership(userId, orgId) {
+    try {
+      const memberDoc = await getDoc(doc(db, `organizations/${orgId}/members`, userId));
+      return memberDoc.exists();
+    } catch (error) {
+      console.error('Error checking org membership:', error);
+      return false;
+    }
+  }
+
+  // Upload file with resumable uploads for large files
+  static async uploadFile(file, userId, orgId = null, additionalMetadata = {}) {
     try {
       // Validate file before upload
       const validation = this.validateFile(file);
       if (!validation.isValid) {
-        throw new Error(`File validation failed: ${validation.errors.join(', ')}`);
+        throw new Error(`Filvalidering feilet: ${validation.errors.join(', ')}`);
       }
 
-      // Generate unique filename with timestamp
-      const timestamp = Date.now();
-      const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
-      const fileRef = ref(storage, `${folder}/${userId}/${timestamp}_${sanitizedName}`);
+      // Check organization membership if orgId is provided
+      if (orgId && !(await this.checkOrgMembership(userId, orgId))) {
+        throw new Error('Du har ikke tilgang til denne organisasjonen');
+      }
 
-      const snapshot = await uploadBytes(fileRef, file);
+      // Generate unique file ID and storage path
+      const fileId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const storagePath = this.generateStoragePath(userId, fileId, orgId);
+      const fileRef = ref(storage, storagePath);
+
+      let snapshot;
+      let uploadTask;
+
+      // Use resumable upload for larger files
+      if (file.size > this.MIN_FILE_SIZE) {
+        uploadTask = uploadBytesResumable(fileRef, file);
+        
+        // Return promise that resolves when upload completes
+        snapshot = await new Promise((resolve, reject) => {
+          uploadTask.on('state_changed',
+            (snapshot) => {
+              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+              console.log(`Upload er ${progress}% ferdig`);
+            },
+            (error) => reject(error),
+            () => resolve(uploadTask.snapshot)
+          );
+        });
+      } else {
+        // Standard upload for smaller files
+        snapshot = await uploadBytes(fileRef, file);
+      }
+
       const downloadURL = await getDownloadURL(snapshot.ref);
 
-      // Auto-categorize file
-      const { category, tags } = this.categorizeFile(file);
-      const courseCode = this.extractCourseInfo(file.name);
+      // Auto-categorize and extract metadata
+      const { category, tags, subcategory } = this.categorizeFile(file);
+      const courseInfo = this.extractCourseInfo(file.name);
 
-      // Save comprehensive metadata to Firestore
+      // Enhanced metadata structure for Norwegian requirements
       const metadata = {
+        // Basic file info
         name: file.name,
         size: file.size,
-        type: file.type,
-        downloadURL,
+        contentType: file.type,
         storagePath: snapshot.ref.fullPath,
+        downloadURL,
+        
+        // User and organization info
         userId,
-        uploadedAt: new Date(),
-        // Enhanced metadata
+        orgId: orgId || null,
+        
+        // Timestamps
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        
+        // Status and visibility
+        status: 'active',
+        visibility: orgId ? 'org' : 'private',
+        
+        // Norwegian-specific categorization
         category,
+        subcategory,
         tags: [...tags, ...(additionalMetadata.tags || [])],
-        courseCode,
-        fileExtension: file.name.split('.').pop().toLowerCase(),
-        description: additionalMetadata.description || '',
-        semester: additionalMetadata.semester || '',
+        
+        // Academic metadata
+        courseCode: courseInfo.courseCode || additionalMetadata.courseCode || '',
+        semester: courseInfo.semester || additionalMetadata.semester || '',
+        assignmentType: courseInfo.assignmentType || additionalMetadata.assignmentType || '',
         subject: additionalMetadata.subject || '',
-        isPublic: additionalMetadata.isPublic || false
+        description: additionalMetadata.description || '',
+        
+        // File metadata
+        fileExtension: file.name.split('.').pop().toLowerCase(),
+        checksum: null, // Could add file checksum for integrity
+        
+        // Norwegian compliance
+        gdprCompliant: true,
+        dataLocation: 'EU'
       };
+
+      // Save to Firestore with proper path structure
+      const docPath = orgId 
+        ? `organizations/${orgId}/files/${fileId}`
+        : `users/${userId}/files/${fileId}`;
       
-      const docRef = await addDoc(collection(db, 'files'), metadata);
+      await setDoc(doc(db, docPath), metadata);
       
       return {
-        id: docRef.id,
+        id: fileId,
         ...metadata
       };
     } catch (error) {
       console.error('Error uploading file:', error);
 
-      // Provide more specific error messages
+      // Norwegian error messages
       if (error.code === 'storage/unauthorized') {
-        throw new Error('Upload failed: You do not have permission to upload files');
+        throw new Error('Opplasting feilet: Du har ikke tillatelse til å laste opp filer');
       } else if (error.code === 'storage/canceled') {
-        throw new Error('Upload was canceled');
+        throw new Error('Opplasting ble avbrutt');
       } else if (error.code === 'storage/quota-exceeded') {
-        throw new Error('Upload failed: Storage quota exceeded');
+        throw new Error('Opplasting feilet: Lagringskvote overskredet');
       } else if (error.code === 'storage/invalid-checksum') {
-        throw new Error('Upload failed: File integrity check failed');
-      } else if (error.message.includes('File validation failed')) {
-        throw error; // Re-throw validation errors as-is
+        throw new Error('Opplasting feilet: Filintegritetskontroll feilet');
+      } else if (error.message.includes('Filvalidering feilet')) {
+        throw error;
       } else {
-        throw new Error(`Upload failed: ${error.message}`);
+        throw new Error(`Opplasting feilet: ${error.message}`);
       }
     }
   }
 
-  static async deleteFile(fileId, storagePath) {
+  // Delete file with proper cleanup
+  static async deleteFile(fileId, storagePath, userId, orgId = null) {
     try {
+      // Check ownership/permission
+      const docPath = orgId 
+        ? `organizations/${orgId}/files/${fileId}`
+        : `users/${userId}/files/${fileId}`;
+      
+      const fileDoc = await getDoc(doc(db, docPath));
+      if (!fileDoc.exists()) {
+        throw new Error('Filen finnes ikke');
+      }
+
+      const fileData = fileDoc.data();
+      if (fileData.userId !== userId && !orgId) {
+        throw new Error('Du har ikke tillatelse til å slette denne filen');
+      }
+
       // Delete from Storage
       const fileRef = ref(storage, storagePath);
       await deleteObject(fileRef);
 
       // Delete from Firestore
-      await deleteDoc(doc(db, 'files', fileId));
+      await deleteDoc(doc(db, docPath));
     } catch (error) {
       console.error('Error deleting file:', error);
 
-      // Provide more specific error messages
       if (error.code === 'storage/object-not-found') {
-        // File doesn't exist in storage, but we should still remove from Firestore
         try {
-          await deleteDoc(doc(db, 'files', fileId));
+          const docPath = orgId 
+            ? `organizations/${orgId}/files/${fileId}`
+            : `users/${userId}/files/${fileId}`;
+          await deleteDoc(doc(db, docPath));
         } catch (firestoreError) {
           console.error('Error deleting from Firestore:', firestoreError);
         }
-        throw new Error('File was already deleted from storage');
+        throw new Error('Filen var allerede slettet fra lagring');
       } else if (error.code === 'storage/unauthorized') {
-        throw new Error('Delete failed: You do not have permission to delete this file');
+        throw new Error('Sletting feilet: Du har ikke tillatelse til å slette denne filen');
       } else {
-        throw new Error(`Delete failed: ${error.message}`);
+        throw new Error(`Sletting feilet: ${error.message}`);
       }
     }
   }
 
+  // Get user files with enhanced filtering
   static async getUserFiles(userId, filters = {}) {
     try {
-      let filesQuery = query(
-        collection(db, 'files'),
-        where('userId', '==', userId)
-      );
+      const basePath = filters.orgId 
+        ? `organizations/${filters.orgId}/files`
+        : `users/${userId}/files`;
 
-      // Add category filter if specified
-      if (filters.category) {
-        filesQuery = query(filesQuery, where('category', '==', filters.category));
+      let filesQuery = collection(db, basePath);
+      
+      if (!filters.orgId) {
+        filesQuery = query(filesQuery, where('userId', '==', userId));
       }
 
       const querySnapshot = await getDocs(filesQuery);
       let files = querySnapshot.docs.map(doc => ({
         id: doc.id,
-        ...doc.data()
+        ...doc.data(),
+        uploadedAt: doc.data().createdAt // Backwards compatibility
       }));
 
-      // Client-side filtering for more complex queries
-      if (filters.tags && filters.tags.length > 0) {
-        files = files.filter(file =>
-          filters.tags.some(tag => file.tags?.includes(tag))
-        );
+      // Client-side filtering
+      if (filters.category) {
+        files = files.filter(file => file.category === filters.category);
       }
 
       if (filters.courseCode) {
@@ -264,19 +397,32 @@ export class FileUploadService {
         );
       }
 
+      if (filters.semester) {
+        files = files.filter(file =>
+          file.semester?.toLowerCase().includes(filters.semester.toLowerCase())
+        );
+      }
+
+      if (filters.tags && filters.tags.length > 0) {
+        files = files.filter(file =>
+          filters.tags.some(tag => file.tags?.includes(tag))
+        );
+      }
+
       if (filters.searchTerm) {
         const term = filters.searchTerm.toLowerCase();
         files = files.filter(file =>
           file.name.toLowerCase().includes(term) ||
           file.description?.toLowerCase().includes(term) ||
-          file.subject?.toLowerCase().includes(term)
+          file.subject?.toLowerCase().includes(term) ||
+          file.courseCode?.toLowerCase().includes(term)
         );
       }
 
-      // Sort by upload date (newest first)
+      // Sort by creation date (newest first)
       files.sort((a, b) => {
-        const dateA = a.uploadedAt?.toDate ? a.uploadedAt.toDate() : new Date(a.uploadedAt);
-        const dateB = b.uploadedAt?.toDate ? b.uploadedAt.toDate() : new Date(b.uploadedAt);
+        const dateA = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
+        const dateB = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
         return dateB - dateA;
       });
 
@@ -287,41 +433,83 @@ export class FileUploadService {
     }
   }
 
-  // Get unique categories for user's files
-  static async getUserCategories(userId) {
+  // Generate time-limited signed URL for external sharing
+  static async generateSignedURL(fileId, userId, orgId = null, expirationHours = 24) {
     try {
-      const files = await this.getUserFiles(userId);
-      const categories = [...new Set(files.map(file => file.category).filter(Boolean))];
-      return categories.sort();
+      // Get Cloud Function for signed URL generation
+      const functions = getFunctions();
+      const generateSignedUrl = httpsCallable(functions, 'generateSignedUrl');
+      
+      const result = await generateSignedUrl({
+        fileId,
+        userId,
+        orgId,
+        expirationHours
+      });
+      
+      return result.data.signedUrl;
     } catch (error) {
-      console.error('Error fetching user categories:', error);
-      throw error;
-    }
-  }
-
-  // Get unique tags for user's files
-  static async getUserTags(userId) {
-    try {
-      const files = await this.getUserFiles(userId);
-      const allTags = files.flatMap(file => file.tags || []);
-      const uniqueTags = [...new Set(allTags)];
-      return uniqueTags.sort();
-    } catch (error) {
-      console.error('Error fetching user tags:', error);
-      throw error;
+      console.error('Error generating signed URL:', error);
+      throw new Error('Kunne ikke generere delingslenke');
     }
   }
 
   // Update file metadata
-  static async updateFileMetadata(fileId, updates) {
+  static async updateFileMetadata(fileId, userId, updates, orgId = null) {
     try {
-      const fileRef = doc(db, 'files', fileId);
+      const docPath = orgId 
+        ? `organizations/${orgId}/files/${fileId}`
+        : `users/${userId}/files/${fileId}`;
+      
+      const fileRef = doc(db, docPath);
       await updateDoc(fileRef, {
         ...updates,
         updatedAt: new Date()
       });
     } catch (error) {
       console.error('Error updating file metadata:', error);
+      throw error;
+    }
+  }
+
+  // Get file statistics for user/organization
+  static async getFileStatistics(userId, orgId = null) {
+    try {
+      const files = await this.getUserFiles(userId, { orgId });
+      
+      const stats = {
+        totalFiles: files.length,
+        totalSize: files.reduce((sum, file) => sum + file.size, 0),
+        categories: {},
+        courseCodes: new Set(),
+        semesters: new Set(),
+        recentUploads: files.filter(file => {
+          const uploadDate = file.createdAt?.toDate ? file.createdAt.toDate() : new Date(file.createdAt);
+          const daysSinceUpload = (Date.now() - uploadDate.getTime()) / (1000 * 60 * 60 * 24);
+          return daysSinceUpload <= 7;
+        }).length
+      };
+
+      // Category breakdown
+      files.forEach(file => {
+        if (file.category) {
+          stats.categories[file.category] = (stats.categories[file.category] || 0) + 1;
+        }
+        if (file.courseCode) {
+          stats.courseCodes.add(file.courseCode);
+        }
+        if (file.semester) {
+          stats.semesters.add(file.semester);
+        }
+      });
+
+      return {
+        ...stats,
+        courseCodes: Array.from(stats.courseCodes),
+        semesters: Array.from(stats.semesters)
+      };
+    } catch (error) {
+      console.error('Error getting file statistics:', error);
       throw error;
     }
   }
