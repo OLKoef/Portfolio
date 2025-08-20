@@ -94,7 +94,7 @@ export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg
         setShowSuccess(true);
         setTimeout(() => {
           setShowSuccess(false);
-        }, 3000);
+        }, 5000);
       }
 
       if (uploadErrors.length > 0) {
@@ -148,7 +148,7 @@ export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg
         setShowSuccess(true);
         setTimeout(() => {
           setShowSuccess(false);
-        }, 3000);
+        }, 5000);
       }
 
       if (uploadErrors.length > 0) {
@@ -257,11 +257,14 @@ export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg
               </div>
             ) : showSuccess ? (
               <div className="upload-success">
-                <svg className="success-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p>Opplasting vellykket!</p>
-                <p className="success-subtitle">Filer lagret sikkert i EU</p>
+                <div className="success-animation">
+                  <svg className="success-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3>Opplasting fullført!</h3>
+                <p className="success-subtitle">{selectedFiles.length} fil(er) lagret sikkert i EU</p>
+                <p className="success-details">Du kan nå se filene dine i filbehandleren</p>
               </div>
             ) : (
               <div className="upload-prompt">
