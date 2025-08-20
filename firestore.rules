@@ -1,0 +1,177 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // User file metadata: users/{uid}/files/{fileId}
+    match /users/{userId}/files/{fileId} {
+      // Users can only access their own file metadata
+      allow read, write, delete: if request.auth != null 
+                                && request.auth.uid == userId;
+      
+      // Validate file metadata on creation/update
+      allow create, update: if request.auth != null 
+                           && request.auth.uid == userId
+                           && validateFileMetadata(request.resource.data);
+    }
+    
+    // Organization metadata
+    match /organizations/{orgId} {
+      // Organization info readable by members
+      allow read: if request.auth != null 
+                 && isOrgMember(request.auth.uid, orgId);
+      
+      // Only admins can modify organization info
+      allow write: if request.auth != null 
+                  && isOrgAdmin(request.auth.uid, orgId);
+    }
+    
+    // Organization members
+    match /organizations/{orgId}/members/{userId} {
+      // Members can read their own membership and other members
+      allow read: if request.auth != null 
+                 && (request.auth.uid == userId || isOrgMember(request.auth.uid, orgId));
+      
+      // Only admins can add/remove members
+      allow write, delete: if request.auth != null 
+                          && isOrgAdmin(request.auth.uid, orgId);
+      
+      // Users can leave organizations themselves
+      allow delete: if request.auth != null 
+                   && request.auth.uid == userId;
+      
+      // Validate member data
+      allow create, update: if validateMemberData(request.resource.data);
+    }
+    
+    // Organization file metadata: organizations/{orgId}/files/{fileId}
+    match /organizations/{orgId}/files/{fileId} {
+      // Organization members can read file metadata
+      allow read: if request.auth != null 
+                 && isOrgMember(request.auth.uid, orgId);
+      
+      // File owners can modify their files
+      allow write, delete: if request.auth != null 
+                          && request.auth.uid == resource.data.userId
+                          && isOrgMember(request.auth.uid, orgId);
+      
+      // Organization admins can manage all files
+      allow write, delete: if request.auth != null 
+                          && isOrgAdmin(request.auth.uid, orgId);
+      
+      // Validate file metadata on creation/update
+      allow create, update: if request.auth != null 
+                           && isOrgMember(request.auth.uid, orgId)
+                           && validateFileMetadata(request.resource.data);
+    }
+    
+    // User profile data
+    match /users/{userId} {
+      // Users can read/write their own profile
+      allow read, write: if request.auth != null 
+                        && request.auth.uid == userId;
+      
+      // Validate user profile data
+      allow create, update: if validateUserProfile(request.resource.data);
+    }
+    
+    // Validation functions
+    
+    // Validate file metadata according to Norwegian requirements
+    function validateFileMetadata(data) {
+      let requiredFields = ['name', 'size', 'contentType', 'storagePath', 'userId', 'createdAt', 'status'];
+      let hasRequiredFields = requiredFields.toSet().difference(data.keys().toSet()).size() == 0;
+      
+      // Validate data types
+      let validTypes = data.name is string 
+                    && data.size is number 
+                    && data.contentType is string
+                    && data.storagePath is string
+                    && data.userId is string
+                    && data.status in ['active', 'deleted', 'processing'];
+      
+      // Validate Norwegian-specific fields
+      let validNorwegianFields = true;
+      if ('courseCode' in data) {
+        validNorwegianFields = validNorwegianFields && data.courseCode is string;
+      }
+      if ('semester' in data) {
+        validNorwegianFields = validNorwegianFields && data.semester is string;
+      }
+      if ('tags' in data) {
+        validNorwegianFields = validNorwegianFields && data.tags is list;
+      }
+      
+      // File size validation (200MB max)
+      let validSize = data.size > 0 && data.size <= 200 * 1024 * 1024;
+      
+      // GDPR compliance check
+      let gdprCompliant = data.get('gdprCompliant', true) == true;
+      let euDataLocation = data.get('dataLocation', 'EU') == 'EU';
+      
+      return hasRequiredFields && validTypes && validNorwegianFields && validSize && gdprCompliant && euDataLocation;
+    }
+    
+    // Validate member data
+    function validateMemberData(data) {
+      let requiredFields = ['userId', 'role', 'joinedAt'];
+      let hasRequiredFields = requiredFields.toSet().difference(data.keys().toSet()).size() == 0;
+      
+      let validRole = data.role in ['member', 'admin', 'moderator'];
+      let validUserId = data.userId is string;
+      
+      return hasRequiredFields && validRole && validUserId;
+    }
+    
+    // Validate user profile
+    function validateUserProfile(data) {
+      let validEmail = data.get('email', '') is string;
+      let validName = data.get('displayName', '') is string;
+      
+      // Norwegian student ID validation (optional)
+      let validStudentId = !('studentId' in data) || 
+                          (data.studentId is string && data.studentId.matches('^[0-9]{6,10}$'));
+      
+      // Norwegian institution validation
+      let validInstitution = !('institution' in data) ||
+                            (data.institution is string && data.institution.size() <= 100);
+      
+      return validEmail && validName && validStudentId && validInstitution;
+    }
+    
+    // Check if user is organization member
+    function isOrgMember(uid, orgId) {
+      return exists(/databases/$(database)/documents/organizations/$(orgId)/members/$(uid));
+    }
+    
+    // Check if user is organization admin
+    function isOrgAdmin(uid, orgId) {
+      let memberDoc = get(/databases/$(database)/documents/organizations/$(orgId)/members/$(uid));
+      return memberDoc.data.role in ['admin'];
+    }
+    
+    // Shared access logs (for Norwegian compliance/auditing)
+    match /access_logs/{logId} {
+      // Only system can write access logs
+      allow read: if request.auth != null;
+      allow write: if false; // Only server-side functions can write logs
+    }
+    
+    // Norwegian compliance documents
+    match /compliance/{docId} {
+      // Read-only for authenticated users
+      allow read: if request.auth != null;
+      allow write: if false; // Only admins via server functions
+    }
+    
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+
+// Additional security rules for Norwegian requirements
+
+// Rate limiting and abuse prevention would be handled at the application level
+// or through Cloud Functions with proper Norwegian data protection compliance
