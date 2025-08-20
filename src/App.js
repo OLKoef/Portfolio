@@ -73,9 +73,9 @@ function AppContent() {
             )}
             <FileUpload
               onUploadSuccess={(results) => {
-                setUploadMessage(`Successfully uploaded ${results.length} file(s)`);
+                setUploadMessage(`✅ Successfully uploaded ${results.length} file(s) - Files are now available in your dashboard`);
                 setMessageType('success');
-                setTimeout(() => setUploadMessage(''), 5000);
+                setTimeout(() => setUploadMessage(''), 8000);
               }}
               onUploadError={(error) => {
                 setUploadMessage(error);
