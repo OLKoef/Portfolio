@@ -200,7 +200,7 @@ export class FileUploadService {
     }
   }
 
-  // Upload file with resumable uploads for large files
+  // Upload file with proper stream handling to prevent locking
   static async uploadFile(file, userId, orgId = null, additionalMetadata = {}) {
     try {
       // Validate file before upload
@@ -220,29 +220,30 @@ export class FileUploadService {
       const fileRef = ref(storage, storagePath);
 
       let snapshot;
-      let uploadTask;
 
-      // Use resumable upload for larger files
-      if (file.size > this.MIN_FILE_SIZE) {
-        uploadTask = uploadBytesResumable(fileRef, file);
-        
-        // Return promise that resolves when upload completes
-        snapshot = await new Promise((resolve, reject) => {
-          uploadTask.on('state_changed',
-            (snapshot) => {
-              const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-              console.log(`Upload er ${progress}% ferdig`);
-            },
-            (error) => reject(error),
-            () => resolve(uploadTask.snapshot)
-          );
-        });
-      } else {
-        // Standard upload for smaller files
-        snapshot = await uploadBytes(fileRef, file);
+      // Create a new File object to prevent stream locking issues
+      const fileToUpload = new File([file], file.name, {
+        type: file.type,
+        lastModified: file.lastModified
+      });
+
+      // Use standard upload for all files to avoid stream issues
+      snapshot = await uploadBytes(fileRef, fileToUpload);
+
+      // Get download URL with error handling
+      let downloadURL;
+      try {
+        downloadURL = await getDownloadURL(snapshot.ref);
+      } catch (urlError) {
+        console.error('Error getting download URL:', urlError);
+        // Clean up the uploaded file if URL generation fails
+        try {
+          await deleteObject(snapshot.ref);
+        } catch (deleteError) {
+          console.error('Error cleaning up file:', deleteError);
+        }
+        throw new Error('Kunne ikke generere nedlastingslenke for filen');
       }
-
-      const downloadURL = await getDownloadURL(snapshot.ref);
 
       // Auto-categorize and extract metadata
       const { category, tags, subcategory } = this.categorizeFile(file);
