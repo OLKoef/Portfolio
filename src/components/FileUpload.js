@@ -90,25 +90,33 @@ export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg
       // Small delay to show 100% progress before success state
       setTimeout(() => {
         if (uploadResults.length > 0) {
+          // Show success state immediately
+          setShowSuccess(true);
+          setUploading(false);
+
+          // Call success callback
           onUploadSuccess?.(uploadResults);
 
-          // Show success state
-          setShowSuccess(true);
+          // Keep success message visible for longer
           setTimeout(() => {
             setShowSuccess(false);
-          }, 5000);
+            resetForm();
+          }, 8000);
+        } else {
+          setUploading(false);
         }
-      }, 500);
+      }, 800);
 
       if (uploadErrors.length > 0) {
         onUploadError?.(`Noen filer kunne ikke lastes opp:\n${uploadErrors.join('\n')}`);
       }
 
-      // Reset form
-      resetForm();
+      if (uploadErrors.length > 0) {
+        onUploadError?.(`Noen filer kunne ikke lastes opp:\n${uploadErrors.join('\n')}`);
+      }
+
     } catch (error) {
       onUploadError?.(error.message);
-    } finally {
       setUploading(false);
       setUploadProgress(0);
     }
@@ -149,22 +157,29 @@ export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg
       // Small delay to show 100% progress before success state
       setTimeout(() => {
         if (uploadResults.length > 0) {
-          onUploadSuccess?.(uploadResults);
+          // Show success state immediately
           setShowSuccess(true);
+          setUploading(false);
+
+          // Call success callback
+          onUploadSuccess?.(uploadResults);
+
+          // Keep success message visible for longer
           setTimeout(() => {
             setShowSuccess(false);
-          }, 5000);
+            resetForm();
+          }, 8000);
+        } else {
+          setUploading(false);
         }
-      }, 500);
+      }, 800);
 
       if (uploadErrors.length > 0) {
         onUploadError?.(`Noen filer kunne ikke lastes opp:\n${uploadErrors.join('\n')}`);
       }
 
-      resetForm();
     } catch (error) {
       onUploadError?.(error.message);
-    } finally {
       setUploading(false);
       setUploadProgress(0);
     }
@@ -268,9 +283,17 @@ export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                   </svg>
                 </div>
-                <h3>Opplasting fullført!</h3>
-                <p className="success-subtitle">{selectedFiles.length} fil(er) lagret sikkert i EU</p>
-                <p className="success-details">Du kan nå se filene dine i filbehandleren</p>
+                <h3>✅ Opplasting fullført!</h3>
+                <p className="success-subtitle">{selectedFiles.length} fil(er) er lastet opp og lagret sikkert</p>
+                <p className="success-details">Filene er nå tilgjengelige i systemet og klar for bruk</p>
+                <div className="success-files-list">
+                  <strong>Opplastede filer:</strong>
+                  {selectedFiles.map((file, index) => (
+                    <div key={index} className="success-file-item">
+                      📄 {file.name}
+                    </div>
+                  ))}
+                </div>
               </div>
             ) : (
               <div className="upload-prompt">
