@@ -54,6 +54,11 @@ export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg
       return;
     }
 
+    if (!currentUser) {
+      onUploadError?.('Du må være logget inn for å laste opp filer');
+      return;
+    }
+
     setUploading(true);
     setUploadProgress(0);
 
@@ -66,21 +71,27 @@ export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg
       const uploadResults = [];
       const uploadErrors = [];
 
-      // Upload files one by one with progress tracking
+      // Upload files one by one with progress tracking and delay between uploads
       for (let i = 0; i < selectedFiles.length; i++) {
         const file = selectedFiles[i];
         try {
           // Update progress
           setUploadProgress(Math.round((i / selectedFiles.length) * 100));
-          
+
+          // Small delay between uploads to prevent stream conflicts
+          if (i > 0) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+
           const result = await FileUploadService.uploadFile(
-            file, 
-            currentUser.uid, 
+            file,
+            currentUser.uid,
             selectedOrg?.id || null,
             additionalMetadata
           );
           uploadResults.push(result);
         } catch (error) {
+          console.error(`Upload error for ${file.name}:`, error);
           uploadErrors.push(`${file.name}: ${error.message}`);
         }
       }
@@ -128,6 +139,11 @@ export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg
       return;
     }
 
+    if (!currentUser) {
+      onUploadError?.('Du må være logget inn for å laste opp filer');
+      return;
+    }
+
     setUploading(true);
     setUploadProgress(0);
 
@@ -135,19 +151,25 @@ export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg
       const uploadResults = [];
       const uploadErrors = [];
 
-      // Upload files with auto-categorization
+      // Upload files with auto-categorization and delay between uploads
       for (let i = 0; i < selectedFiles.length; i++) {
         const file = selectedFiles[i];
         try {
           setUploadProgress(Math.round((i / selectedFiles.length) * 100));
-          
+
+          // Small delay between uploads to prevent stream conflicts
+          if (i > 0) {
+            await new Promise(resolve => setTimeout(resolve, 100));
+          }
+
           const result = await FileUploadService.uploadFile(
-            file, 
+            file,
             currentUser.uid,
             selectedOrg?.id || null
           );
           uploadResults.push(result);
         } catch (error) {
+          console.error(`Upload error for ${file.name}:`, error);
           uploadErrors.push(`${file.name}: ${error.message}`);
         }
       }
