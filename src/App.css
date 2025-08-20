@@ -596,6 +596,36 @@ body {
   font-weight: 500;
 }
 
+.success-files-list {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 8px;
+  border: 1px solid #10b981;
+  text-align: left;
+}
+
+.success-files-list strong {
+  color: #047857;
+  font-size: 0.875rem;
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+.success-file-item {
+  color: #065f46;
+  font-size: 0.8rem;
+  padding: 0.25rem 0;
+  border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.success-file-item:last-child {
+  border-bottom: none;
+}
+
 .spinner {
   width: 2rem;
   height: 2rem;
