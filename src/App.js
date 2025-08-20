@@ -73,9 +73,9 @@ function AppContent() {
             )}
             <FileUpload
               onUploadSuccess={(results) => {
-                setUploadMessage(`✅ Successfully uploaded ${results.length} file(s) - Files are now available in your dashboard`);
+                setUploadMessage(`🎉 Vellykket opplasting! ${results.length} fil(er) er nå lagret sikkert og tilgjengelig i systemet. Du kan finne filene dine i filbehandleren.`);
                 setMessageType('success');
-                setTimeout(() => setUploadMessage(''), 8000);
+                setTimeout(() => setUploadMessage(''), 12000);
               }}
               onUploadError={(error) => {
                 setUploadMessage(error);
