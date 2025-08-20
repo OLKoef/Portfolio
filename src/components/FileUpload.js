@@ -49,16 +49,21 @@ export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg
   };
   
   const handleUploadWithMetadata = async () => {
+    console.log('🚀 Starting upload with metadata for', selectedFiles.length, 'files');
+
     if (!isFirebaseConfigured) {
+      console.error('❌ Firebase not configured');
       onUploadError?.('Firebase er ikke konfigurert riktig. Kontakt support.');
       return;
     }
 
     if (!currentUser) {
+      console.error('❌ No current user');
       onUploadError?.('Du må være logget inn for å laste opp filer');
       return;
     }
 
+    console.log('✅ Starting upload...');
     setUploading(true);
     setUploadProgress(0);
 
