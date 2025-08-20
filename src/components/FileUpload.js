@@ -87,15 +87,18 @@ export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg
 
       setUploadProgress(100);
 
-      if (uploadResults.length > 0) {
-        onUploadSuccess?.(uploadResults);
+      // Small delay to show 100% progress before success state
+      setTimeout(() => {
+        if (uploadResults.length > 0) {
+          onUploadSuccess?.(uploadResults);
 
-        // Show success state
-        setShowSuccess(true);
-        setTimeout(() => {
-          setShowSuccess(false);
-        }, 5000);
-      }
+          // Show success state
+          setShowSuccess(true);
+          setTimeout(() => {
+            setShowSuccess(false);
+          }, 5000);
+        }
+      }, 500);
 
       if (uploadErrors.length > 0) {
         onUploadError?.(`Noen filer kunne ikke lastes opp:\n${uploadErrors.join('\n')}`);
