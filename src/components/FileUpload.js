@@ -87,15 +87,18 @@ export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg
 
       setUploadProgress(100);
 
-      if (uploadResults.length > 0) {
-        onUploadSuccess?.(uploadResults);
+      // Small delay to show 100% progress before success state
+      setTimeout(() => {
+        if (uploadResults.length > 0) {
+          onUploadSuccess?.(uploadResults);
 
-        // Show success state
-        setShowSuccess(true);
-        setTimeout(() => {
-          setShowSuccess(false);
-        }, 3000);
-      }
+          // Show success state
+          setShowSuccess(true);
+          setTimeout(() => {
+            setShowSuccess(false);
+          }, 5000);
+        }
+      }, 500);
 
       if (uploadErrors.length > 0) {
         onUploadError?.(`Noen filer kunne ikke lastes opp:\n${uploadErrors.join('\n')}`);
@@ -143,13 +146,16 @@ export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg
 
       setUploadProgress(100);
 
-      if (uploadResults.length > 0) {
-        onUploadSuccess?.(uploadResults);
-        setShowSuccess(true);
-        setTimeout(() => {
-          setShowSuccess(false);
-        }, 3000);
-      }
+      // Small delay to show 100% progress before success state
+      setTimeout(() => {
+        if (uploadResults.length > 0) {
+          onUploadSuccess?.(uploadResults);
+          setShowSuccess(true);
+          setTimeout(() => {
+            setShowSuccess(false);
+          }, 5000);
+        }
+      }, 500);
 
       if (uploadErrors.length > 0) {
         onUploadError?.(`Noen filer kunne ikke lastes opp:\n${uploadErrors.join('\n')}`);
@@ -257,11 +263,14 @@ export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg
               </div>
             ) : showSuccess ? (
               <div className="upload-success">
-                <svg className="success-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                <p>Opplasting vellykket!</p>
-                <p className="success-subtitle">Filer lagret sikkert i EU</p>
+                <div className="success-animation">
+                  <svg className="success-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                </div>
+                <h3>Opplasting fullført!</h3>
+                <p className="success-subtitle">{selectedFiles.length} fil(er) lagret sikkert i EU</p>
+                <p className="success-details">Du kan nå se filene dine i filbehandleren</p>
               </div>
             ) : (
               <div className="upload-prompt">
