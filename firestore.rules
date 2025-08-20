@@ -90,17 +90,10 @@ service cloud.firestore {
                     && data.userId is string
                     && data.status in ['active', 'deleted', 'processing'];
       
-      // Validate Norwegian-specific fields
-      let validNorwegianFields = true;
-      if ('courseCode' in data) {
-        validNorwegianFields = validNorwegianFields && data.courseCode is string;
-      }
-      if ('semester' in data) {
-        validNorwegianFields = validNorwegianFields && data.semester is string;
-      }
-      if ('tags' in data) {
-        validNorwegianFields = validNorwegianFields && data.tags is list;
-      }
+      // Validate Norwegian-specific fields (simplified)
+      let validNorwegianFields = (!('courseCode' in data) || data.courseCode is string)
+                              && (!('semester' in data) || data.semester is string)
+                              && (!('tags' in data) || data.tags is list);
       
       // File size validation (200MB max)
       let validSize = data.size > 0 && data.size <= 200 * 1024 * 1024;
@@ -170,8 +163,3 @@ service cloud.firestore {
     }
   }
 }
-
-// Additional security rules for Norwegian requirements
-
-// Rate limiting and abuse prevention would be handled at the application level
-// or through Cloud Functions with proper Norwegian data protection compliance
