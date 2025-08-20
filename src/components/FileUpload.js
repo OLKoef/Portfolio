@@ -71,17 +71,15 @@ export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg
       const uploadResults = [];
       const uploadErrors = [];
 
-      // Upload files one by one with progress tracking and delay between uploads
+      // Upload files sequentially with proper error handling
       for (let i = 0; i < selectedFiles.length; i++) {
         const file = selectedFiles[i];
         try {
           // Update progress
-          setUploadProgress(Math.round((i / selectedFiles.length) * 100));
+          const progressPercent = Math.round((i / selectedFiles.length) * 90); // Leave 10% for completion
+          setUploadProgress(progressPercent);
 
-          // Small delay between uploads to prevent stream conflicts
-          if (i > 0) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-          }
+          console.log(`Uploading file ${i + 1}/${selectedFiles.length}: ${file.name}`);
 
           const result = await FileUploadService.uploadFile(
             file,
@@ -89,7 +87,10 @@ export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg
             selectedOrg?.id || null,
             additionalMetadata
           );
+
           uploadResults.push(result);
+          console.log(`File uploaded successfully: ${file.name}`);
+
         } catch (error) {
           console.error(`Upload error for ${file.name}:`, error);
           uploadErrors.push(`${file.name}: ${error.message}`);
@@ -151,23 +152,24 @@ export default function FileUpload({ onUploadSuccess, onUploadError, selectedOrg
       const uploadResults = [];
       const uploadErrors = [];
 
-      // Upload files with auto-categorization and delay between uploads
+      // Upload files sequentially with auto-categorization
       for (let i = 0; i < selectedFiles.length; i++) {
         const file = selectedFiles[i];
         try {
-          setUploadProgress(Math.round((i / selectedFiles.length) * 100));
+          const progressPercent = Math.round((i / selectedFiles.length) * 90); // Leave 10% for completion
+          setUploadProgress(progressPercent);
 
-          // Small delay between uploads to prevent stream conflicts
-          if (i > 0) {
-            await new Promise(resolve => setTimeout(resolve, 100));
-          }
+          console.log(`Quick uploading file ${i + 1}/${selectedFiles.length}: ${file.name}`);
 
           const result = await FileUploadService.uploadFile(
             file,
             currentUser.uid,
             selectedOrg?.id || null
           );
+
           uploadResults.push(result);
+          console.log(`File uploaded successfully: ${file.name}`);
+
         } catch (error) {
           console.error(`Upload error for ${file.name}:`, error);
           uploadErrors.push(`${file.name}: ${error.message}`);
