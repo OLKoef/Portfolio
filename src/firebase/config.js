@@ -61,9 +61,17 @@ if (isFirebaseConfigured) {
     auth = getAuth(app);
     storage = getStorage(app);
     db = getFirestore(app);
+
+    console.log('✅ Firebase initialized successfully');
   } catch (error) {
-    console.error('Firebase initialization error:', error);
+    console.error('❌ Firebase initialization error:', error);
+    console.error('Firebase config being used:', {
+      ...firebaseConfig,
+      apiKey: firebaseConfig.apiKey ? `${firebaseConfig.apiKey.substring(0, 10)}...` : 'missing'
+    });
   }
+} else {
+  console.warn('🚫 Firebase not initialized - missing environment variables');
 }
 
 export { auth, storage, db };
