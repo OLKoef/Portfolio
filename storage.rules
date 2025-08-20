@@ -49,49 +49,29 @@ service firebase.storage {
         'image/jpg'
       ];
       
-      // Allowed file extensions
-      let allowedExtensions = ['pdf', 'docx', 'xlsx', 'png', 'jpg', 'jpeg', 'dwg', 'dxf'];
-      let filename = resource.name.lower();
-      let hasValidExtension = allowedExtensions.exists(ext => filename.matches('.*\\.' + ext + '$'));
-      
       // MIME type validation
-      let validMimeType = allowedTypes.exists(type => resource.contentType == type) ||
+      let validMimeType = resource.contentType in allowedTypes ||
                          resource.contentType.matches('application/(dwg|dxf)') ||
                          resource.contentType.matches('image/vnd\\.(dwg|dxf)');
       
       // Filename validation (no dangerous characters)
       let safeFilename = !resource.name.matches('.*[<>:"/\\\\|?*].*');
       
-      // Norwegian character support
-      let validLength = resource.name.size() <= 255;
+      // File name length validation
+      let validLength = resource.name.size() <= 255 && resource.name.size() > 0;
       
-      return validSize && hasValidExtension && validMimeType && safeFilename && validLength;
+      return validSize && validMimeType && safeFilename && validLength;
     }
     
-    // Function to check organization membership
+    // Function to check organization membership (simplified)
     function isOrgMember(uid, orgId) {
-      // This would typically check Firestore for membership
-      // For now, we'll use a simplified check
+      // This checks if the member document exists in Firestore
       return exists(/databases/(default)/documents/organizations/$(orgId)/members/$(uid));
     }
     
     // Deny all other access
     match /{allPaths=**} {
       allow read, write: if false;
-    }
-  }
-}
-
-// Additional rules for enhanced security
-
-// App Check enforcement (prevents bot/script abuse)
-service firebase.storage {
-  match /b/{bucket}/o {
-    match /{allPaths=**} {
-      // Require App Check for all operations in production
-      allow read, write: if request.auth != null;
-      // Note: App Check integration would be added here:
-      // && request.app_check_token != null;
     }
   }
 }
