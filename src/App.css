@@ -445,9 +445,24 @@ body {
 }
 
 .message.success {
-  background: #d1fae5;
+  background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
   color: #065f46;
-  border: 1px solid #a7f3d0;
+  border: 2px solid #10b981;
+  font-weight: 600;
+  font-size: 1.1rem;
+  animation: successFadeIn 0.5s ease-out;
+  box-shadow: 0 4px 6px rgba(16, 185, 129, 0.1);
+}
+
+@keyframes successFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .message.error {
