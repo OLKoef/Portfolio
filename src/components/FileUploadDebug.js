@@ -44,20 +44,27 @@ export default function FileUploadDebug({ onUploadSuccess, onUploadError }) {
 
       for (let i = 0; i < files.length; i++) {
         const file = files[i];
-        console.log(`📤 DEBUG: Uploading file ${i + 1}/${files.length}: ${file.name}`);
-        
+        console.log(`📤 DEBUG: Uploading file ${i + 1}/${files.length}: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)}MB)`);
+
         try {
-          setUploadProgress(Math.round((i / files.length) * 90));
-          
+          const progressBefore = Math.round((i / files.length) * 90);
+          console.log(`📊 DEBUG: Setting progress to ${progressBefore}%`);
+          setUploadProgress(progressBefore);
+
+          console.log('🔄 DEBUG: Calling FileUploadService.uploadFile...');
           const result = await FileUploadService.uploadFile(
             file,
             currentUser.uid,
             null // no org
           );
-          
+
           console.log('✅ DEBUG: Upload successful:', result);
           results.push(result);
-          
+
+          const progressAfter = Math.round(((i + 1) / files.length) * 90);
+          console.log(`📊 DEBUG: Setting progress to ${progressAfter}%`);
+          setUploadProgress(progressAfter);
+
         } catch (error) {
           console.error('❌ DEBUG: Upload failed:', error);
           errors.push(`${file.name}: ${error.message}`);
@@ -106,7 +113,7 @@ export default function FileUploadDebug({ onUploadSuccess, onUploadError }) {
 
   return (
     <div style={{ border: '2px dashed #ccc', padding: '20px', margin: '20px 0' }}>
-      <h3>🔧 Debug File Upload</h3>
+      <h3>��� Debug File Upload</h3>
       
       {!uploading && !showSuccess && (
         <div>
