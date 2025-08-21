@@ -255,12 +255,14 @@ export class FileUploadService {
         dataLocation: 'EU'
       };
 
+      console.log('🔍 STEP 7: Preparing Firestore save...');
       // Save to Firestore with retry logic
-      const docPath = orgId 
+      const docPath = orgId
         ? `organizations/${orgId}/files/${fileId}`
         : `users/${userId}/files/${fileId}`;
-      
-      console.log('Saving metadata to Firestore:', docPath);
+
+      console.log('✅ STEP 7: Firestore document path prepared:', docPath);
+      console.log('🔍 STEP 8: Saving metadata to Firestore...');
       
       let retries = 3;
       while (retries > 0) {
