@@ -66,6 +66,13 @@ function AppContent() {
           </div>
         )}
 
+        {activeTab === 'resources' && (
+          <div className="resources-content">
+            <h2>Resources</h2>
+            <p>Helpful resources and documentation for your projects.</p>
+          </div>
+        )}
+
         {activeTab === 'dashboard' && (
           <div className="dashboard-content">
             {/* Dashboard content intentionally left empty */}
