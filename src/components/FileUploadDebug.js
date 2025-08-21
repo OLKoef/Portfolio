@@ -11,7 +11,9 @@ export default function FileUploadDebug({ onUploadSuccess, onUploadError }) {
 
   const handleFileUpload = async (files) => {
     console.log('🚀 DEBUG: Starting upload for', files.length, 'files');
-    
+    console.log('🔍 DEBUG: Firebase configured:', isFirebaseConfigured);
+    console.log('🔍 DEBUG: Current user:', currentUser?.uid);
+
     if (!isFirebaseConfigured) {
       console.error('❌ DEBUG: Firebase not configured');
       onUploadError?.('Firebase er ikke konfigurert riktig');
@@ -24,8 +26,17 @@ export default function FileUploadDebug({ onUploadSuccess, onUploadError }) {
       return;
     }
 
+    console.log('✅ DEBUG: Prerequisites met, starting upload...');
     setUploading(true);
     setUploadProgress(0);
+
+    // Add a timeout to catch hanging uploads
+    const uploadTimeout = setTimeout(() => {
+      console.error('⏰ DEBUG: Upload timeout after 30 seconds');
+      setUploading(false);
+      setUploadProgress(0);
+      onUploadError?.('Upload timeout - operasjonen tok for lang tid');
+    }, 30000);
 
     try {
       const results = [];
