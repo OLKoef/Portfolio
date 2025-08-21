@@ -2,10 +2,6 @@ import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginForm, UserInfo, SignOutButton } from './components/Auth';
 import BuilderContent, { BuilderPage } from './components/BuilderContent';
-import FileUpload from './components/FileUpload';
-import FileUploadDebug from './components/FileUploadDebug';
-import FirebaseTest from './components/FirebaseTest';
-import SimpleFirestoreTest from './components/SimpleFirestoreTest';
 import './App.css';
 
 function AppContent() {
