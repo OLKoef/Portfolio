@@ -71,6 +71,8 @@ export default function FileUploadDebug({ onUploadSuccess, onUploadError }) {
         }
       }
 
+      clearTimeout(uploadTimeout);
+      console.log('📊 DEBUG: Setting final progress to 100%');
       setUploadProgress(100);
       console.log('📊 DEBUG: Final results:', results.length, 'successful,', errors.length, 'errors');
 
@@ -78,7 +80,7 @@ export default function FileUploadDebug({ onUploadSuccess, onUploadError }) {
         console.log('🎉 DEBUG: Showing success state');
         setShowSuccess(true);
         onUploadSuccess?.(results);
-        
+
         setTimeout(() => {
           console.log('🔄 DEBUG: Hiding success state');
           setShowSuccess(false);
@@ -97,6 +99,7 @@ export default function FileUploadDebug({ onUploadSuccess, onUploadError }) {
       }
 
     } catch (error) {
+      clearTimeout(uploadTimeout);
       console.error('❌ DEBUG: General upload error:', error);
       onUploadError?.(error.message);
       setUploading(false);
@@ -113,7 +116,7 @@ export default function FileUploadDebug({ onUploadSuccess, onUploadError }) {
 
   return (
     <div style={{ border: '2px dashed #ccc', padding: '20px', margin: '20px 0' }}>
-      <h3>��� Debug File Upload</h3>
+      <h3>🔧 Debug File Upload</h3>
       
       {!uploading && !showSuccess && (
         <div>
