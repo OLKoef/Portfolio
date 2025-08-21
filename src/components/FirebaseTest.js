@@ -68,14 +68,23 @@ export default function FirebaseTest() {
 
       const docPath = `users/${currentUser.uid}/files/${testFileId}`;
       addLog(`📍 Firestore path: ${docPath}`);
-      
-      const firestorePromise = setDoc(doc(db, docPath), testDoc);
-      const firestoreTimeoutPromise = new Promise((_, reject) => 
-        setTimeout(() => reject(new Error('Firestore write timeout')), 15000)
-      );
-      
-      await Promise.race([firestorePromise, firestoreTimeoutPromise]);
-      addLog('✅ Firestore write successful');
+      addLog(`📄 Document data: ${JSON.stringify(testDoc, null, 2)}`);
+
+      try {
+        addLog('🔄 Attempting Firestore setDoc...');
+        const firestorePromise = setDoc(doc(db, docPath), testDoc);
+        const firestoreTimeoutPromise = new Promise((_, reject) =>
+          setTimeout(() => reject(new Error('Firestore write timeout')), 10000)
+        );
+
+        await Promise.race([firestorePromise, firestoreTimeoutPromise]);
+        addLog('✅ Firestore write successful');
+      } catch (firestoreError) {
+        addLog(`❌ Firestore error details: ${firestoreError.message}`);
+        addLog(`❌ Firestore error code: ${firestoreError.code || 'unknown'}`);
+        addLog(`❌ Firestore error stack: ${firestoreError.stack || 'no stack'}`);
+        throw firestoreError;
+      }
 
       addLog('🎉 All tests passed! Firebase is working correctly.');
       setTestStatus('success');
