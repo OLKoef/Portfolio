@@ -60,13 +60,9 @@ if (isFirebaseConfigured) {
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
     storage = getStorage(app);
+    db = getFirestore(app);
 
-    // Initialize Firestore with useFetchStreams: false to prevent ReadableStream locking issues
-    db = initializeFirestore(app, {
-      useFetchStreams: false
-    });
-
-    console.log('✅ Firebase initialized successfully with XHR transport');
+    console.log('✅ Firebase initialized successfully');
   } catch (error) {
     console.error('❌ Firebase initialization error:', error);
     console.error('Firebase config being used:', {
