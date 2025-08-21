@@ -35,7 +35,8 @@ export default function SimpleFirestoreTest() {
         userId: currentUser.uid
       };
 
-      const docRef = doc(db, 'test-collection', `test-${Date.now()}`);
+      // Try the same path structure that would work with our rules
+      const docRef = doc(db, `users/${currentUser.uid}/files`, `test-${Date.now()}`);
       addLog('📝 Attempting to write simple test document...');
       
       // Direct call with explicit timeout
