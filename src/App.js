@@ -36,6 +36,12 @@ function AppContent() {
             >
               Tools
             </button>
+            <button
+              className={`nav-button ${activeTab === 'resources' ? 'active' : ''}`}
+              onClick={() => setActiveTab('resources')}
+            >
+              Resources
+            </button>
           </nav>
           <div className="header-user-actions">
             <SignOutButton />
