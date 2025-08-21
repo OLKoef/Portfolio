@@ -214,46 +214,36 @@ export class FileUploadService {
       const { category, tags, subcategory } = this.categorizeFile(file);
       const courseInfo = this.extractCourseInfo(file.name);
 
-      // Create metadata
+      console.log('🔍 STEP 8: Creating simplified metadata...');
+      // Create metadata (simplified to match security rules)
       const metadata = {
-        // Basic file info
+        // Required fields only
         name: file.name,
         size: file.size,
         contentType: file.type,
         storagePath: snapshot.ref.fullPath,
-        downloadURL,
-        
-        // User and organization info
         userId,
-        orgId: orgId || null,
-        
-        // Timestamps
         createdAt: new Date(),
-        updatedAt: new Date(),
-        
-        // Status and visibility
         status: 'active',
+
+        // Optional fields
+        downloadURL,
+        orgId: orgId || null,
+        updatedAt: new Date(),
         visibility: orgId ? 'org' : 'private',
-        
-        // Categorization
         category,
         subcategory,
         tags: [...tags, ...(additionalMetadata.tags || [])],
-        
-        // Academic metadata
         courseCode: courseInfo.courseCode || additionalMetadata.courseCode || '',
         semester: courseInfo.semester || additionalMetadata.semester || '',
         assignmentType: courseInfo.assignmentType || additionalMetadata.assignmentType || '',
         subject: additionalMetadata.subject || '',
         description: additionalMetadata.description || '',
-        
-        // File metadata
         fileExtension: file.name.split('.').pop().toLowerCase(),
-        
-        // Compliance
         gdprCompliant: true,
         dataLocation: 'EU'
       };
+      console.log('✅ STEP 8: Simplified metadata created');
 
       console.log('🔍 STEP 7: Preparing Firestore save...');
       // Save to Firestore with retry logic
