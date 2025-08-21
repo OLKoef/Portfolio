@@ -62,48 +62,7 @@ function AppContent() {
 
         {activeTab === 'dashboard' && (
           <div className="dashboard-content">
-            <h2>Dashboard</h2>
-            <div className="dashboard-overview">
-              <div className="welcome-section">
-                <h3>Velkommen til BØY Portfolio</h3>
-                <p>Bygg og administrer din digitale portfolio med våre verktøy og tjenester.</p>
-              </div>
-
-              <div className="dashboard-stats">
-                <div className="stat-card">
-                  <h4>Portfolio Status</h4>
-                  <p>Ditt portfolio er aktivt og tilgjengelig</p>
-                </div>
-
-                <div className="stat-card">
-                  <h4>Profil</h4>
-                  <p>Profilen din er fullstendig og oppdatert</p>
-                </div>
-
-                <div className="stat-card">
-                  <h4>Verktøy</h4>
-                  <p>Utforsk verktøy for å forbedre portfolioen din</p>
-                </div>
-              </div>
-
-              <div className="quick-actions">
-                <h3>Hurtighandlinger</h3>
-                <div className="action-buttons">
-                  <button
-                    className="action-button"
-                    onClick={() => setActiveTab('portfolio')}
-                  >
-                    📁 Se Portfolio
-                  </button>
-                  <button
-                    className="action-button"
-                    onClick={() => setActiveTab('tools')}
-                  >
-                    🛠️ Bruk Verktøy
-                  </button>
-                </div>
-              </div>
-            </div>
+            {/* Dashboard content intentionally left empty */}
           </div>
         )}
       </main>
