@@ -166,7 +166,13 @@ export class FileUploadService {
 
   // Simplified upload method to avoid stream issues
   static async uploadFile(file, userId, orgId = null, additionalMetadata = {}) {
-    console.log('Starting file upload:', file.name);
+    console.log('📥 FileUploadService.uploadFile CALLED:', {
+      fileName: file.name,
+      fileSize: file.size,
+      fileType: file.type,
+      userId,
+      orgId
+    });
     
     try {
       // Validate file before upload
