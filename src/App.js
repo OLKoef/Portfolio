@@ -4,6 +4,7 @@ import { LoginForm, UserInfo, SignOutButton } from './components/Auth';
 import BuilderContent, { BuilderPage } from './components/BuilderContent';
 import FileUpload from './components/FileUpload';
 import FileUploadDebug from './components/FileUploadDebug';
+import FirebaseTest from './components/FirebaseTest';
 import './App.css';
 
 function AppContent() {
