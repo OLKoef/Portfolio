@@ -50,9 +50,11 @@ function AppContent() {
       </header>
 
       <main className="app-main">
-        <div className="user-profile-corner">
-          <UserInfo />
-        </div>
+        {activeTab === 'dashboard' && (
+          <div className="user-profile-corner">
+            <UserInfo />
+          </div>
+        )}
         {activeTab === 'portfolio' && (
           <div className="portfolio-content">
             <BuilderPage urlPath="/" />
