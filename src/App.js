@@ -7,8 +7,6 @@ import './App.css';
 function AppContent() {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [uploadMessage, setUploadMessage] = useState('');
-  const [messageType, setMessageType] = useState('');
 
   if (!currentUser) {
     return <LoginForm />;
