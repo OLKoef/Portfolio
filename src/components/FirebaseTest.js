@@ -61,23 +61,9 @@ export default function FirebaseTest() {
         size: testBlob.size,
         contentType: 'text/plain',
         storagePath,
-        downloadURL,
         userId: currentUser.uid,
         createdAt: new Date(),
-        updatedAt: new Date(),
-        status: 'active',
-        visibility: 'private',
-        category: 'Test',
-        subcategory: 'Connectivity Test',
-        tags: ['test'],
-        courseCode: '',
-        semester: '',
-        assignmentType: '',
-        subject: '',
-        description: 'Firebase connectivity test',
-        fileExtension: 'txt',
-        gdprCompliant: true,
-        dataLocation: 'EU'
+        status: 'active'
       };
 
       const docPath = `users/${currentUser.uid}/files/${testFileId}`;
