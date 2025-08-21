@@ -74,6 +74,8 @@ function AppContent() {
               </div>
             )}
 
+            <FirebaseTest />
+
             <FileUploadDebug
               onUploadSuccess={(results) => {
                 setUploadMessage(`🎉 DEBUG: Successfully uploaded ${results.length} file(s)!`);
