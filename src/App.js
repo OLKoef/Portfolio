@@ -75,6 +75,8 @@ function AppContent() {
               </div>
             )}
 
+            <SimpleFirestoreTest />
+
             <FirebaseTest />
 
             <FileUploadDebug
