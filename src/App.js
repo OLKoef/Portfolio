@@ -64,42 +64,48 @@ function AppContent() {
 
         {activeTab === 'dashboard' && (
           <div className="dashboard-content">
-            <h2>Upload Files</h2>
-            {uploadMessage && (
-              <div className={`message ${messageType}`}>
-                {uploadMessage}
+            <h2>Dashboard</h2>
+            <div className="dashboard-overview">
+              <div className="welcome-section">
+                <h3>Velkommen til BØY Portfolio</h3>
+                <p>Bygg og administrer din digitale portfolio med våre verktøy og tjenester.</p>
               </div>
-            )}
 
-            <SimpleFirestoreTest />
+              <div className="dashboard-stats">
+                <div className="stat-card">
+                  <h4>Portfolio Status</h4>
+                  <p>Ditt portfolio er aktivt og tilgjengelig</p>
+                </div>
 
-            <FirebaseTest />
+                <div className="stat-card">
+                  <h4>Profil</h4>
+                  <p>Profilen din er fullstendig og oppdatert</p>
+                </div>
 
-            <FileUploadDebug
-              onUploadSuccess={(results) => {
-                setUploadMessage(`🎉 DEBUG: Successfully uploaded ${results.length} file(s)!`);
-                setMessageType('success');
-                setTimeout(() => setUploadMessage(''), 8000);
-              }}
-              onUploadError={(error) => {
-                setUploadMessage(`❌ DEBUG: ${error}`);
-                setMessageType('error');
-                setTimeout(() => setUploadMessage(''), 10000);
-              }}
-            />
+                <div className="stat-card">
+                  <h4>Verktøy</h4>
+                  <p>Utforsk verktøy for å forbedre portfolioen din</p>
+                </div>
+              </div>
 
-            <FileUpload
-              onUploadSuccess={(results) => {
-                setUploadMessage(`🎉 Vellykket opplasting! ${results.length} fil(er) er nå lagret sikkert og tilgjengelig i systemet. Du kan finne filene dine i filbehandleren.`);
-                setMessageType('success');
-                setTimeout(() => setUploadMessage(''), 12000);
-              }}
-              onUploadError={(error) => {
-                setUploadMessage(error);
-                setMessageType('error');
-                setTimeout(() => setUploadMessage(''), 10000);
-              }}
-            />
+              <div className="quick-actions">
+                <h3>Hurtighandlinger</h3>
+                <div className="action-buttons">
+                  <button
+                    className="action-button"
+                    onClick={() => setActiveTab('portfolio')}
+                  >
+                    📁 Se Portfolio
+                  </button>
+                  <button
+                    className="action-button"
+                    onClick={() => setActiveTab('tools')}
+                  >
+                    🛠️ Bruk Verktøy
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </main>
