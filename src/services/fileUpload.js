@@ -191,13 +191,19 @@ export class FileUploadService {
 
       console.log('Uploading to path:', storagePath);
 
+      console.log('🔍 STEP 3: Converting file to ArrayBuffer...');
       // Convert file to ArrayBuffer to avoid stream issues
       const arrayBuffer = await file.arrayBuffer();
-      const blob = new Blob([arrayBuffer], { type: file.type });
+      console.log('✅ STEP 3: ArrayBuffer created, size:', arrayBuffer.byteLength);
 
+      console.log('🔍 STEP 4: Creating blob...');
+      const blob = new Blob([arrayBuffer], { type: file.type });
+      console.log('✅ STEP 4: Blob created, size:', blob.size);
+
+      console.log('🔍 STEP 5: Starting Firebase storage upload...');
       // Upload the blob instead of the file
       const snapshot = await uploadBytes(fileRef, blob);
-      console.log('Upload successful:', snapshot.ref.fullPath);
+      console.log('✅ STEP 5: Storage upload successful:', snapshot.ref.fullPath);
 
       // Get download URL
       const downloadURL = await getDownloadURL(snapshot.ref);
