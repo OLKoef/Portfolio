@@ -21,7 +21,9 @@ export default function SimpleFirestoreTest() {
       addLog('🚀 Starting minimal Firestore test...');
       addLog(`👤 Current user: ${currentUser?.uid}`);
       addLog(`🗄️ Firestore instance: ${db ? 'initialized' : 'not initialized'}`);
-      
+      addLog(`🏢 Project ID: ${db?.app?.options?.projectId || 'unknown'}`);
+      addLog(`🌐 Auth domain: ${db?.app?.options?.authDomain || 'unknown'}`);
+
       if (!currentUser) {
         throw new Error('No authenticated user');
       }
