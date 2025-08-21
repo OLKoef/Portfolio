@@ -205,9 +205,10 @@ export class FileUploadService {
       const snapshot = await uploadBytes(fileRef, blob);
       console.log('✅ STEP 5: Storage upload successful:', snapshot.ref.fullPath);
 
+      console.log('🔍 STEP 6: Getting download URL...');
       // Get download URL
       const downloadURL = await getDownloadURL(snapshot.ref);
-      console.log('Download URL generated:', downloadURL);
+      console.log('✅ STEP 6: Download URL generated:', downloadURL);
 
       // Auto-categorize and extract metadata
       const { category, tags, subcategory } = this.categorizeFile(file);
