@@ -175,11 +175,14 @@ export class FileUploadService {
     });
     
     try {
+      console.log('🔍 STEP 1: Starting file validation...');
       // Validate file before upload
       const validation = this.validateFile(file);
       if (!validation.isValid) {
+        console.error('❌ STEP 1 FAILED: File validation failed:', validation.errors);
         throw new Error(`Filvalidering feilet: ${validation.errors.join(', ')}`);
       }
+      console.log('✅ STEP 1: File validation passed');
 
       // Generate unique file ID and storage path
       const fileId = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
