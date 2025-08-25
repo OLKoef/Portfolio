@@ -132,6 +132,14 @@ function AppContent() {
       <footer className="app-footer">
         <p>&copy; 2024 Portfolio. Built with React, Firebase, and Builder.io</p>
       </footer>
+
+      {/* Calculator Modals */}
+      {activeCalculator === 'basic' && (
+        <BasicCalculator onClose={closeCalculator} />
+      )}
+      {activeCalculator === 'engineering' && (
+        <EngineeringCalculator onClose={closeCalculator} />
+      )}
     </div>
   );
 }
