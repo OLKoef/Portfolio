@@ -10,7 +10,6 @@ import './App.css';
 function AppContent() {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [activeToolsView, setActiveToolsView] = useState('calculations');
   const [activeCalculator, setActiveCalculator] = useState(null);
 
   const openCalculator = (calculatorType) => {
