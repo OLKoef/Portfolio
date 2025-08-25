@@ -65,7 +65,39 @@ function AppContent() {
         {activeTab === 'tools' && (
           <div className="tools-content">
             <h2>Tools</h2>
-            <p>Access various tools and utilities for your projects.</p>
+            <div className="tools-sub-header">
+              <nav className="sub-nav">
+                <button
+                  className={`sub-nav-button ${activeToolsView === 'calculations' ? 'active' : ''}`}
+                  onClick={() => setActiveToolsView('calculations')}
+                >
+                  Calculations
+                </button>
+              </nav>
+            </div>
+
+            <div className="tools-view-content">
+              {activeToolsView === 'calculations' && (
+                <div className="calculations-view">
+                  <h3>Calculations</h3>
+                  <p>Perform various calculations and computational tasks.</p>
+                  <div className="calculation-tools">
+                    <div className="tool-card">
+                      <h4>Basic Calculator</h4>
+                      <p>Simple arithmetic calculations</p>
+                    </div>
+                    <div className="tool-card">
+                      <h4>Engineering Calculator</h4>
+                      <p>Advanced mathematical functions</p>
+                    </div>
+                    <div className="tool-card">
+                      <h4>Unit Converter</h4>
+                      <p>Convert between different units</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
