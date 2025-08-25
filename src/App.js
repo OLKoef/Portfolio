@@ -93,17 +93,20 @@ function AppContent() {
                   <h3>Calculations</h3>
                   <p>Perform various calculations and computational tasks.</p>
                   <div className="calculation-tools">
-                    <div className="tool-card">
+                    <div className="tool-card clickable" onClick={() => openCalculator('basic')}>
                       <h4>Basic Calculator</h4>
                       <p>Simple arithmetic calculations</p>
+                      <div className="tool-card-action">Click to open</div>
                     </div>
-                    <div className="tool-card">
+                    <div className="tool-card clickable" onClick={() => openCalculator('engineering')}>
                       <h4>Engineering Calculator</h4>
                       <p>Advanced mathematical functions</p>
+                      <div className="tool-card-action">Click to open</div>
                     </div>
                     <div className="tool-card">
                       <h4>Unit Converter</h4>
                       <p>Convert between different units</p>
+                      <div className="tool-card-status">Coming soon</div>
                     </div>
                   </div>
                 </div>
