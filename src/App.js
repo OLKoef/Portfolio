@@ -4,6 +4,7 @@ import { LoginForm, UserInfo, SignOutButton } from './components/Auth';
 import BuilderContent, { BuilderPage } from './components/BuilderContent';
 import BasicCalculator from './components/BasicCalculator';
 import EngineeringCalculator from './components/EngineeringCalculator';
+import UnitConverter from './components/UnitConverter';
 import './App.css';
 
 function AppContent() {
