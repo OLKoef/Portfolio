@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginForm, UserInfo, SignOutButton } from './components/Auth';
 import BuilderContent, { BuilderPage } from './components/BuilderContent';
+import BasicCalculator from './components/BasicCalculator';
+import EngineeringCalculator from './components/EngineeringCalculator';
 import './App.css';
 
 function AppContent() {
