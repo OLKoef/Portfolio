@@ -104,10 +104,10 @@ function AppContent() {
                       <p>Advanced mathematical functions</p>
                       <div className="tool-card-action">Click to open</div>
                     </div>
-                    <div className="tool-card">
+                    <div className="tool-card clickable" onClick={() => openCalculator('converter')}>
                       <h4>Unit Converter</h4>
                       <p>Convert between different units</p>
-                      <div className="tool-card-status">Coming soon</div>
+                      <div className="tool-card-action">Click to open</div>
                     </div>
                   </div>
                 </div>
