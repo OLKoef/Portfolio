@@ -141,6 +141,9 @@ function AppContent() {
       {activeCalculator === 'engineering' && (
         <EngineeringCalculator onClose={closeCalculator} />
       )}
+      {activeCalculator === 'converter' && (
+        <UnitConverter onClose={closeCalculator} />
+      )}
     </div>
   );
 }
