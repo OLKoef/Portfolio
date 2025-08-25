@@ -673,6 +673,15 @@ body {
   grid-auto-rows: minmax(3rem, auto);
 }
 
+.calculator-buttons.engineering-grid .calc-btn {
+  min-height: 3rem;
+  font-size: 0.875rem;
+}
+
+.calculator-buttons.engineering-grid .calc-btn.function {
+  font-size: 0.75rem;
+}
+
 .calc-btn {
   background: white;
   border: none;
