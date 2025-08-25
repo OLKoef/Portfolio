@@ -7,6 +7,7 @@ import './App.css';
 function AppContent() {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeToolsView, setActiveToolsView] = useState('calculations');
 
   if (!currentUser) {
     return <LoginForm />;
