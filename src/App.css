@@ -732,7 +732,7 @@ body {
   background: #059669;
 }
 
-.calc-btn.zero {
+.calculator-buttons:not(.engineering-grid) .calc-btn.zero {
   grid-column: span 2;
 }
 
