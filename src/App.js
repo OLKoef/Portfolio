@@ -2,14 +2,23 @@ import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginForm, UserInfo, SignOutButton } from './components/Auth';
 import BuilderContent, { BuilderPage } from './components/BuilderContent';
-import FileUpload from './components/FileUpload';
+import BasicCalculator from './components/BasicCalculator';
+import EngineeringCalculator from './components/EngineeringCalculator';
+import UnitConverter from './components/UnitConverter';
 import './App.css';
 
 function AppContent() {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [uploadMessage, setUploadMessage] = useState('');
-  const [messageType, setMessageType] = useState('');
+  const [activeCalculator, setActiveCalculator] = useState(null);
+
+  const openCalculator = (calculatorType) => {
+    setActiveCalculator(calculatorType);
+  };
+
+  const closeCalculator = () => {
+    setActiveCalculator(null);
+  };
 
   if (!currentUser) {
     return <LoginForm />;
@@ -39,6 +48,12 @@ function AppContent() {
             >
               Tools
             </button>
+            <button
+              className={`nav-button ${activeTab === 'resources' ? 'active' : ''}`}
+              onClick={() => setActiveTab('resources')}
+            >
+              Resources
+            </button>
           </nav>
           <div className="header-user-actions">
             <SignOutButton />
@@ -47,9 +62,11 @@ function AppContent() {
       </header>
 
       <main className="app-main">
-        <div className="user-profile-corner">
-          <UserInfo />
-        </div>
+        {activeTab === 'dashboard' && (
+          <div className="user-profile-corner">
+            <UserInfo />
+          </div>
+        )}
         {activeTab === 'portfolio' && (
           <div className="portfolio-content">
             <BuilderPage urlPath="/" />
@@ -58,31 +75,40 @@ function AppContent() {
 
         {activeTab === 'tools' && (
           <div className="tools-content">
-            <h2>Tools</h2>
-            <p>Access various tools and utilities for your projects.</p>
+            <div className="calculations-view">
+              <h3>Calculations</h3>
+              <p>Perform various calculations and computational tasks.</p>
+              <div className="calculation-tools">
+                <div className="tool-card clickable" onClick={() => openCalculator('basic')}>
+                  <h4>Basic Calculator</h4>
+                  <p>Simple arithmetic calculations</p>
+                  <div className="tool-card-action">Click to open</div>
+                </div>
+                <div className="tool-card clickable" onClick={() => openCalculator('engineering')}>
+                  <h4>Engineering Calculator</h4>
+                  <p>Advanced mathematical functions</p>
+                  <div className="tool-card-action">Click to open</div>
+                </div>
+                <div className="tool-card clickable" onClick={() => openCalculator('converter')}>
+                  <h4>Unit Converter</h4>
+                  <p>Convert between different units</p>
+                  <div className="tool-card-action">Click to open</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {activeTab === 'resources' && (
+          <div className="resources-content">
+            <h2>Resources</h2>
+            <p>Helpful resources and documentation for your projects.</p>
           </div>
         )}
 
         {activeTab === 'dashboard' && (
           <div className="dashboard-content">
-            <h2>Upload Files</h2>
-            {uploadMessage && (
-              <div className={`message ${messageType}`}>
-                {uploadMessage}
-              </div>
-            )}
-            <FileUpload
-              onUploadSuccess={(results) => {
-                setUploadMessage(`✅ Successfully uploaded ${results.length} file(s) - Files are now available in your dashboard`);
-                setMessageType('success');
-                setTimeout(() => setUploadMessage(''), 8000);
-              }}
-              onUploadError={(error) => {
-                setUploadMessage(error);
-                setMessageType('error');
-                setTimeout(() => setUploadMessage(''), 10000);
-              }}
-            />
+            {/* Dashboard content intentionally left empty */}
           </div>
         )}
       </main>
@@ -90,6 +116,17 @@ function AppContent() {
       <footer className="app-footer">
         <p>&copy; 2024 Portfolio. Built with React, Firebase, and Builder.io</p>
       </footer>
+
+      {/* Calculator Modals */}
+      {activeCalculator === 'basic' && (
+        <BasicCalculator onClose={closeCalculator} />
+      )}
+      {activeCalculator === 'engineering' && (
+        <EngineeringCalculator onClose={closeCalculator} />
+      )}
+      {activeCalculator === 'converter' && (
+        <UnitConverter onClose={closeCalculator} />
+      )}
     </div>
   );
 }

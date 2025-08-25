@@ -1,7 +1,7 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getStorage } from 'firebase/storage';
-import { getFirestore } from 'firebase/firestore';
+import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
 
 // Firebase configuration with environment variables
 const firebaseConfig = {
@@ -60,10 +60,30 @@ if (isFirebaseConfigured) {
     app = initializeApp(firebaseConfig);
     auth = getAuth(app);
     storage = getStorage(app);
+
+    // Initialize Firestore with explicit database reference
     db = getFirestore(app);
+
+    console.log('✅ Firebase initialized successfully');
+    console.log('🗄️ Firestore project:', firebaseConfig.projectId);
+    console.log('🗄️ Firestore app name:', app.name);
+
+    // Log the actual Firestore instance for debugging
+    console.log('🔍 Firestore instance details:', {
+      app: db.app.name,
+      type: db.type,
+      settings: db._delegate?._databaseId || 'unknown'
+    });
+
   } catch (error) {
-    console.error('Firebase initialization error:', error);
+    console.error('❌ Firebase initialization error:', error);
+    console.error('Firebase config being used:', {
+      ...firebaseConfig,
+      apiKey: firebaseConfig.apiKey ? `${firebaseConfig.apiKey.substring(0, 10)}...` : 'missing'
+    });
   }
+} else {
+  console.warn('🚫 Firebase not initialized - missing environment variables');
 }
 
 export { auth, storage, db };
