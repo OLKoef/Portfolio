@@ -547,6 +547,16 @@ body {
   transform: translateY(-4px);
   box-shadow: 0 12px 24px rgba(76, 81, 191, 0.25);
   animation: dragPulse 1s ease-in-out infinite alternate;
+  border-style: dashed;
+}
+
+.upload-button.drag-over .upload-label {
+  font-weight: 700;
+}
+
+.upload-button.drag-over .upload-description {
+  font-weight: 600;
+  font-style: italic;
 }
 
 .upload-button.drag-over svg {
