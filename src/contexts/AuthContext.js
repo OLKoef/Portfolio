@@ -36,7 +36,15 @@ export function AuthProvider({ children }) {
   async function signup(email, password) {
     setLoading(true);
     setAuthError(null);
-    
+
+    // Server-side domain validation
+    if (!email.toLowerCase().endsWith('@hvl.no')) {
+      const domainError = 'Only @hvl.no email addresses are allowed';
+      setAuthError(domainError);
+      setLoading(false);
+      throw new Error(domainError);
+    }
+
     try {
       const { data, error } = await supabase.auth.signUp({
         email,
