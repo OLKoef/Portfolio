@@ -114,7 +114,7 @@ function AppContent() {
       </main>
 
       <footer className="app-footer">
-        <p>&copy; 2024 Portfolio. Built with React, Firebase, and Builder.io</p>
+        <p>&copy; 2024 Portfolio. Built with React, Supabase, and Builder.io</p>
       </footer>
 
       {/* Calculator Modals */}
