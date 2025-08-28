@@ -76,16 +76,50 @@ export default function Settings({ onClose }) {
         </div>
         
         <div className="settings-content">
-          {/* User Account Section */}
+          {/* User Profile Section */}
           <div className="settings-section">
             <div className="settings-section-header">
               <FiUser size={18} />
-              <h4>Account</h4>
+              <h4>Profile</h4>
             </div>
             <div className="settings-item">
-              <label>Profile Information</label>
-              <p className="settings-description">Manage your account details and preferences</p>
-              <button className="settings-button secondary">Edit Profile</button>
+              <label htmlFor="profile-name">Name</label>
+              <input
+                type="text"
+                id="profile-name"
+                className="settings-input"
+                placeholder="Enter your full name"
+              />
+            </div>
+            <div className="settings-item">
+              <label htmlFor="profile-age">Age</label>
+              <input
+                type="number"
+                id="profile-age"
+                className="settings-input"
+                placeholder="Enter your age"
+                min="16"
+                max="100"
+              />
+            </div>
+            <div className="settings-item">
+              <label htmlFor="academic-year">Academic Year</label>
+              <select id="academic-year" className="settings-select">
+                <option value="">Select your year</option>
+                <option value="first">First Year</option>
+                <option value="second">Second Year</option>
+                <option value="third">Third Year</option>
+                <option value="master">Master</option>
+              </select>
+            </div>
+            <div className="settings-item">
+              <label htmlFor="profile-bio">Bio</label>
+              <textarea
+                id="profile-bio"
+                className="settings-textarea"
+                rows="4"
+                placeholder="Tell us about yourself..."
+              ></textarea>
             </div>
           </div>
 
