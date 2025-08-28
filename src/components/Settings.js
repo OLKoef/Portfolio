@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { FiX, FiUser, FiMoon, FiSun, FiGlobe, FiBell } from 'react-icons/fi';
+import { FiX, FiUser, FiMoon, FiSun, FiGlobe } from 'react-icons/fi';
 
 export default function Settings({ onClose }) {
   const modalRef = useRef(null);
@@ -122,32 +122,6 @@ export default function Settings({ onClose }) {
                 <option value="en">English</option>
                 <option value="no">Norsk</option>
               </select>
-            </div>
-          </div>
-
-          {/* Notifications Section */}
-          <div className="settings-section">
-            <div className="settings-section-header">
-              <FiBell size={18} />
-              <h4>Notifications</h4>
-            </div>
-            <div className="settings-item">
-              <label>Calculator Sounds</label>
-              <div className="settings-toggle">
-                <input type="checkbox" id="calculator-sounds" />
-                <label htmlFor="calculator-sounds" className="toggle-switch">
-                  <span className="toggle-slider"></span>
-                </label>
-              </div>
-            </div>
-            <div className="settings-item">
-              <label>Email Notifications</label>
-              <div className="settings-toggle">
-                <input type="checkbox" id="email-notifications" defaultChecked />
-                <label htmlFor="email-notifications" className="toggle-switch">
-                  <span className="toggle-slider"></span>
-                </label>
-              </div>
             </div>
           </div>
 
