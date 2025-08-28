@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { FiSettings } from 'react-icons/fi';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginForm, UserInfo, SignOutButton } from './components/Auth';
 import BuilderContent, { BuilderPage } from './components/BuilderContent';
@@ -57,7 +58,7 @@ function AppContent() {
           </nav>
           <div className="header-user-actions">
             <button className="settings-button" aria-label="Settings">
-              SET
+              <FiSettings size={18} />
             </button>
             <SignOutButton />
           </div>
