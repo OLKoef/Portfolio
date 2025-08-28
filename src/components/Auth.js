@@ -10,10 +10,21 @@ export function LoginForm() {
 
   const { login, signup, authError } = useAuth();
 
+  const validateEmailDomain = (email) => {
+    return email.toLowerCase().endsWith('@hvl.no');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    // Validate email domain before proceeding
+    if (!validateEmailDomain(email)) {
+      setError('Only @hvl.no email addresses are allowed');
+      setLoading(false);
+      return;
+    }
 
     try {
       if (isSignup) {
