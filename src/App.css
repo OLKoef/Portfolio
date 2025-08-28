@@ -521,6 +521,8 @@ body {
   min-height: 180px;
   justify-content: center;
   gap: 1rem;
+  position: relative;
+  overflow: hidden;
 }
 
 .upload-button:hover {
