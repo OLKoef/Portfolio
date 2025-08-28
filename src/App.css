@@ -584,21 +584,25 @@ body {
   line-height: 1.4;
 }
 
-.notes-upload:hover {
+.notes-upload:hover,
+.notes-upload.drag-over {
   border-color: #059669;
   background: #ecfdf5;
 }
 
-.notes-upload:hover svg {
+.notes-upload:hover svg,
+.notes-upload.drag-over svg {
   color: #059669;
 }
 
-.resources-upload:hover {
+.resources-upload:hover,
+.resources-upload.drag-over {
   border-color: #dc2626;
   background: #fef2f2;
 }
 
-.resources-upload:hover svg {
+.resources-upload:hover svg,
+.resources-upload.drag-over svg {
   color: #dc2626;
 }
 
