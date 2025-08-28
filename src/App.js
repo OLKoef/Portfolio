@@ -31,6 +31,31 @@ function AppContent() {
     setShowSettings(false);
   };
 
+  const handleUpload = (type) => {
+    // Create a file input element
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.multiple = true;
+
+    // Set accepted file types based on upload type
+    if (type === 'notes') {
+      input.accept = '.pdf,.doc,.docx,.txt,.md';
+    } else if (type === 'resources') {
+      input.accept = '.pdf,.doc,.docx,.ppt,.pptx,.zip,.jpg,.jpeg,.png';
+    }
+
+    input.onchange = (event) => {
+      const files = Array.from(event.target.files);
+      if (files.length > 0) {
+        console.log(`Uploading ${files.length} ${type}:`, files.map(f => f.name));
+        // TODO: Implement actual file upload to Supabase storage
+        alert(`${files.length} ${type} selected for upload: ${files.map(f => f.name).join(', ')}`);
+      }
+    };
+
+    input.click();
+  };
+
   if (!currentUser) {
     return <LoginForm />;
   }
