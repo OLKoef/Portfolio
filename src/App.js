@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiSettings } from 'react-icons/fi';
+import { FiSettings, FiUpload, FiBookOpen, FiFolderOpen } from 'react-icons/fi';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginForm, UserInfo, SignOutButton } from './components/Auth';
 import BuilderContent, { BuilderPage } from './components/BuilderContent';
@@ -117,7 +117,27 @@ function AppContent() {
 
         {activeTab === 'dashboard' && (
           <div className="dashboard-content">
-            {/* Dashboard content intentionally left empty */}
+            <div className="dashboard-welcome">
+              <h2>Welcome to your Dashboard</h2>
+              <p>Upload and manage your academic resources</p>
+            </div>
+
+            <div className="upload-section">
+              <h3>Upload Content</h3>
+              <div className="upload-buttons">
+                <button className="upload-button notes-upload" onClick={() => handleUpload('notes')}>
+                  <FiBookOpen size={24} />
+                  <span className="upload-label">Upload Notes</span>
+                  <span className="upload-description">Add your study notes and documents</span>
+                </button>
+
+                <button className="upload-button resources-upload" onClick={() => handleUpload('resources')}>
+                  <FiFolderOpen size={24} />
+                  <span className="upload-label">Upload Resources</span>
+                  <span className="upload-description">Add learning resources and materials</span>
+                </button>
+              </div>
+            </div>
           </div>
         )}
       </main>
