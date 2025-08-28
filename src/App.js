@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiSettings, FiUpload, FiBookOpen, FiFolderOpen } from 'react-icons/fi';
+import { FiSettings, FiUpload, FiBookOpen, FiFolder } from 'react-icons/fi';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginForm, UserInfo, SignOutButton } from './components/Auth';
 import BuilderContent, { BuilderPage } from './components/BuilderContent';
