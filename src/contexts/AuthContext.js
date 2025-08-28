@@ -1,11 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged
-} from 'firebase/auth';
-import { auth, isFirebaseConfigured } from '../firebase/config';
+import { supabase } from '../supabase/config';
 
 const AuthContext = createContext();
 
@@ -16,61 +10,94 @@ export function useAuth() {
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [firebaseError, setFirebaseError] = useState(null);
+  const [authError, setAuthError] = useState(null);
 
-
-  // Check if Firebase is configured
   useEffect(() => {
-    if (!isFirebaseConfigured) {
-      setFirebaseError('Firebase is not properly configured. Please check your environment variables.');
+    // Get initial session
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setCurrentUser(session?.user || null);
       setLoading(false);
-      return;
-    }
+    };
 
-    if (!auth) {
-      setFirebaseError('Firebase Auth is not initialized.');
-      setLoading(false);
-      return;
-    }
+    getSession();
 
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCurrentUser(user);
-      setLoading(false);
-    });
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setCurrentUser(session?.user || null);
+        setLoading(false);
+      }
+    );
 
-    return unsubscribe;
+    return () => subscription?.unsubscribe();
   }, []);
 
-  async function signup(email, pin) {
-    if (!auth) throw new Error('Firebase Auth not configured');
+  async function signup(email, password) {
+    setLoading(true);
+    setAuthError(null);
+    
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
 
-    // Validate PIN format
-    if (!pin || pin.length < 4 || pin.length > 6 || !/^\d+$/.test(pin)) {
-      throw new Error('PIN must be 4-6 digits');
+      if (error) {
+        setAuthError(error.message);
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      setAuthError(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
     }
-
-    // Use email + PIN as password (you might want to hash this for production)
-    const tempPassword = `${email}_${pin}_temp`;
-    return createUserWithEmailAndPassword(auth, email, tempPassword);
   }
 
-  async function login(email, pin) {
-    if (!auth) throw new Error('Firebase Auth not configured');
+  async function login(email, password) {
+    setLoading(true);
+    setAuthError(null);
+    
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
-    // Validate PIN format
-    if (!pin || pin.length < 4 || pin.length > 6 || !/^\d+$/.test(pin)) {
-      throw new Error('PIN must be 4-6 digits');
+      if (error) {
+        setAuthError(error.message);
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      setAuthError(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
     }
-
-    // Use email + PIN as password (you might want to hash this for production)
-    const tempPassword = `${email}_${pin}_temp`;
-    return signInWithEmailAndPassword(auth, email, tempPassword);
   }
-
 
   async function logout() {
-    if (!auth) throw new Error('Firebase Auth not configured');
-    return signOut(auth);
+    setLoading(true);
+    setAuthError(null);
+    
+    try {
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        setAuthError(error.message);
+        throw error;
+      }
+    } catch (error) {
+      setAuthError(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   }
 
   const value = {
@@ -78,8 +105,9 @@ export function AuthProvider({ children }) {
     signup,
     login,
     logout,
-    firebaseError,
-    isFirebaseConfigured
+    authError,
+    loading,
+    isSupabaseConfigured: true
   };
 
   return (
