@@ -45,7 +45,7 @@ export function LoginForm() {
         <h2>{isSignup ? 'Create Account' : 'Sign In'}</h2>
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">Email (@hvl.no domain required)</label>
             <input
               type="email"
               id="email"
@@ -53,7 +53,13 @@ export function LoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={loading}
+              className={email && !validateEmailDomain(email) ? 'invalid-domain' : ''}
             />
+            {email && !validateEmailDomain(email) && (
+              <div className="domain-hint">
+                Please use your @hvl.no email address
+              </div>
+            )}
           </div>
           <div className="form-group">
             <label htmlFor="password">Password</label>
