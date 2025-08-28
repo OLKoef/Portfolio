@@ -112,9 +112,9 @@ export default function BasicCalculator({ onClose }) {
         return firstValue + secondValue;
       case '-':
         return firstValue - secondValue;
-      case '×':
+      case '*':
         return firstValue * secondValue;
-      case '÷':
+      case '/':
         return secondValue !== 0 ? firstValue / secondValue : 0;
       default:
         return secondValue;
@@ -164,19 +164,19 @@ export default function BasicCalculator({ onClose }) {
         
         <div className="calculator-buttons">
           <button className="calc-btn function" onClick={clear}>C</button>
-          <button className="calc-btn function" onClick={handleSign}>±</button>
+          <button className="calc-btn function" onClick={handleSign}>+/-</button>
           <button className="calc-btn function" onClick={handlePercentage}>%</button>
-          <button className="calc-btn operator" onClick={() => performOperation('÷')}>÷</button>
+          <button className="calc-btn operator" onClick={() => performOperation('/')}>/</button>
           
           <button className="calc-btn number" onClick={() => inputNumber(7)}>7</button>
           <button className="calc-btn number" onClick={() => inputNumber(8)}>8</button>
           <button className="calc-btn number" onClick={() => inputNumber(9)}>9</button>
-          <button className="calc-btn operator" onClick={() => performOperation('×')}>×</button>
+          <button className="calc-btn operator" onClick={() => performOperation('*')}>*</button>
           
           <button className="calc-btn number" onClick={() => inputNumber(4)}>4</button>
           <button className="calc-btn number" onClick={() => inputNumber(5)}>5</button>
           <button className="calc-btn number" onClick={() => inputNumber(6)}>6</button>
-          <button className="calc-btn operator" onClick={() => performOperation('-')}>−</button>
+          <button className="calc-btn operator" onClick={() => performOperation('-')}>-</button>
           
           <button className="calc-btn number" onClick={() => inputNumber(1)}>1</button>
           <button className="calc-btn number" onClick={() => inputNumber(2)}>2</button>
