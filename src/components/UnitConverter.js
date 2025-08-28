@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { FiX, FiRefreshCw } from 'react-icons/fi';
 
 export default function UnitConverter({ onClose }) {
   const modalRef = useRef(null);
@@ -236,7 +237,9 @@ export default function UnitConverter({ onClose }) {
             className="close-button"
             onClick={onClose}
             aria-label="Close unit converter"
-          >×</button>
+          >
+            <FiX size={20} />
+          </button>
         </div>
         
         <div className="converter-content">

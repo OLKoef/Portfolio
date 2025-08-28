@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { FiX } from 'react-icons/fi';
 
 export default function EngineeringCalculator({ onClose }) {
   const modalRef = useRef(null);
@@ -216,7 +217,9 @@ export default function EngineeringCalculator({ onClose }) {
             className="close-button"
             onClick={onClose}
             aria-label="Close engineering calculator"
-          >×</button>
+          >
+            <FiX size={20} />
+          </button>
         </div>
         
         <div className="calculator-display">
