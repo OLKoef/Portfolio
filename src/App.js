@@ -14,6 +14,7 @@ function AppContent() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [activeCalculator, setActiveCalculator] = useState(null);
   const [showSettings, setShowSettings] = useState(false);
+  const [dragOverType, setDragOverType] = useState(null);
 
   const openCalculator = (calculatorType) => {
     setActiveCalculator(calculatorType);
@@ -29,6 +30,32 @@ function AppContent() {
 
   const closeSettings = () => {
     setShowSettings(false);
+  };
+
+  // Helper function to filter files by type
+  const filterFilesByType = (files, type) => {
+    const allowedTypes = {
+      notes: ['.pdf', '.doc', '.docx', '.txt', '.md'],
+      resources: ['.pdf', '.doc', '.docx', '.ppt', '.pptx', '.zip', '.jpg', '.jpeg', '.png']
+    };
+
+    const extensions = allowedTypes[type] || [];
+    return files.filter(file => {
+      const extension = '.' + file.name.split('.').pop().toLowerCase();
+      return extensions.includes(extension);
+    });
+  };
+
+  // Process uploaded files
+  const processFiles = (files, type) => {
+    const validFiles = filterFilesByType(files, type);
+    if (validFiles.length > 0) {
+      console.log(`Uploading ${validFiles.length} ${type}:`, validFiles.map(f => f.name));
+      // TODO: Implement actual file upload to Supabase storage
+      alert(`${validFiles.length} ${type} selected for upload: ${validFiles.map(f => f.name).join(', ')}`);
+    } else {
+      alert(`No valid ${type} files found. Please check file types.`);
+    }
   };
 
   const handleUpload = (type) => {
@@ -47,13 +74,44 @@ function AppContent() {
     input.onchange = (event) => {
       const files = Array.from(event.target.files);
       if (files.length > 0) {
-        console.log(`Uploading ${files.length} ${type}:`, files.map(f => f.name));
-        // TODO: Implement actual file upload to Supabase storage
-        alert(`${files.length} ${type} selected for upload: ${files.map(f => f.name).join(', ')}`);
+        processFiles(files, type);
       }
     };
 
     input.click();
+  };
+
+  // Drag and drop handlers
+  const handleDragEnter = (e, type) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOverType(type);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    // Only clear drag state if leaving the button entirely
+    if (!e.currentTarget.contains(e.relatedTarget)) {
+      setDragOverType(null);
+    }
+  };
+
+  const handleDrop = (e, type) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragOverType(null);
+
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0) {
+      processFiles(files, type);
+    }
   };
 
   if (!currentUser) {
@@ -150,16 +208,34 @@ function AppContent() {
             <div className="upload-section">
               <h3>Upload Content</h3>
               <div className="upload-buttons">
-                <button className="upload-button notes-upload" onClick={() => handleUpload('notes')}>
+                <button
+                  className={`upload-button notes-upload ${dragOverType === 'notes' ? 'drag-over' : ''}`}
+                  onClick={() => handleUpload('notes')}
+                  onDragEnter={(e) => handleDragEnter(e, 'notes')}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, 'notes')}
+                >
                   <FiBookOpen size={24} />
                   <span className="upload-label">Upload Notes</span>
-                  <span className="upload-description">Add your study notes and documents</span>
+                  <span className="upload-description">
+                    {dragOverType === 'notes' ? 'Drop your notes here!' : 'Add your study notes and documents'}
+                  </span>
                 </button>
 
-                <button className="upload-button resources-upload" onClick={() => handleUpload('resources')}>
+                <button
+                  className={`upload-button resources-upload ${dragOverType === 'resources' ? 'drag-over' : ''}`}
+                  onClick={() => handleUpload('resources')}
+                  onDragEnter={(e) => handleDragEnter(e, 'resources')}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={(e) => handleDrop(e, 'resources')}
+                >
                   <FiFolder size={24} />
                   <span className="upload-label">Upload Resources</span>
-                  <span className="upload-description">Add learning resources and materials</span>
+                  <span className="upload-description">
+                    {dragOverType === 'resources' ? 'Drop your resources here!' : 'Add learning resources and materials'}
+                  </span>
                 </button>
               </div>
             </div>
