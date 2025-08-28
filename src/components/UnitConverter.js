@@ -94,8 +94,8 @@ export default function UnitConverter({ onClose }) {
     temperature: {
       name: 'Temperature',
       units: {
-        celsius: { name: 'Celsius (°C)', factor: 1 },
-        fahrenheit: { name: 'Fahrenheit (°F)', factor: 1 },
+        celsius: { name: 'Celsius (C)', factor: 1 },
+        fahrenheit: { name: 'Fahrenheit (F)', factor: 1 },
         kelvin: { name: 'Kelvin (K)', factor: 1 }
       }
     },
@@ -115,11 +115,11 @@ export default function UnitConverter({ onClose }) {
     area: {
       name: 'Area',
       units: {
-        squareMeter: { name: 'Square Meter (m²)', factor: 1 },
-        squareKilometer: { name: 'Square Kilometer (km²)', factor: 1000000 },
-        squareCentimeter: { name: 'Square Centimeter (cm²)', factor: 0.0001 },
-        squareFoot: { name: 'Square Foot (ft²)', factor: 0.092903 },
-        squareInch: { name: 'Square Inch (in²)', factor: 0.00064516 },
+        squareMeter: { name: 'Square Meter (m^2)', factor: 1 },
+        squareKilometer: { name: 'Square Kilometer (km^2)', factor: 1000000 },
+        squareCentimeter: { name: 'Square Centimeter (cm^2)', factor: 0.0001 },
+        squareFoot: { name: 'Square Foot (ft^2)', factor: 0.092903 },
+        squareInch: { name: 'Square Inch (in^2)', factor: 0.00064516 },
         acre: { name: 'Acre', factor: 4046.86 },
         hectare: { name: 'Hectare (ha)', factor: 10000 }
       }
