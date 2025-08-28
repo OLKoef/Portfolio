@@ -37,7 +37,7 @@ function AppContent() {
 
   return (
     <div className="app" aria-hidden={activeCalculator || showSettings ? 'true' : 'false'}>
-      <header className="app-header" aria-hidden={activeCalculator ? 'true' : 'false'}>
+      <header className="app-header" aria-hidden={activeCalculator || showSettings ? 'true' : 'false'}>
         <div className="header-content">
           <h1 className="app-title">BØY</h1>
           <nav className="main-nav">
@@ -67,7 +67,7 @@ function AppContent() {
             </button>
           </nav>
           <div className="header-user-actions">
-            <button className="settings-button" aria-label="Settings">
+            <button className="settings-button" onClick={openSettings} aria-label="Settings">
               <FiSettings size={18} />
             </button>
             <SignOutButton />
@@ -75,7 +75,7 @@ function AppContent() {
         </div>
       </header>
 
-      <main className="app-main" aria-hidden={activeCalculator ? 'true' : 'false'}>
+      <main className="app-main" aria-hidden={activeCalculator || showSettings ? 'true' : 'false'}>
         {activeTab === 'portfolio' && (
           <div className="portfolio-content">
             <BuilderPage urlPath="/" />
@@ -122,7 +122,7 @@ function AppContent() {
         )}
       </main>
 
-      <footer className="app-footer" aria-hidden={activeCalculator ? 'true' : 'false'}>
+      <footer className="app-footer" aria-hidden={activeCalculator || showSettings ? 'true' : 'false'}>
         <p>&copy; 2024 Portfolio. Built with React, Supabase, and Builder.io</p>
       </footer>
 
@@ -135,6 +135,11 @@ function AppContent() {
       )}
       {activeCalculator === 'converter' && (
         <UnitConverter onClose={closeCalculator} />
+      )}
+
+      {/* Settings Modal */}
+      {showSettings && (
+        <Settings onClose={closeSettings} />
       )}
     </div>
   );
