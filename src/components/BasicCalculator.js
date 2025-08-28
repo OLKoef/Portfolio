@@ -152,7 +152,7 @@ export default function BasicCalculator({ onClose }) {
             className="close-button"
             onClick={onClose}
             aria-label="Close calculator"
-          >×</button>
+          >X</button>
         </div>
         
         <div className="calculator-display">
