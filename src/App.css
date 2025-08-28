@@ -571,6 +571,44 @@ body {
   color: #dc2626;
 }
 
+/* Responsive Dashboard */
+@media (max-width: 768px) {
+  .dashboard-welcome {
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .dashboard-welcome h2 {
+    font-size: 1.5rem;
+  }
+
+  .dashboard-welcome p {
+    font-size: 1rem;
+  }
+
+  .upload-section {
+    padding: 1.5rem;
+  }
+
+  .upload-buttons {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .upload-button {
+    padding: 1.5rem;
+    min-height: 150px;
+  }
+
+  .upload-label {
+    font-size: 1rem;
+  }
+
+  .upload-description {
+    font-size: 0.8rem;
+  }
+}
+
 .dashboard-overview {
   display: flex;
   flex-direction: column;
