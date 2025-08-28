@@ -1,10 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { FiX } from 'react-icons/fi';
 
 export default function BasicCalculator({ onClose }) {
+  const modalRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const previousActiveElement = useRef(null);
   const [display, setDisplay] = useState('0');
   const [previousValue, setPreviousValue] = useState(null);
   const [operation, setOperation] = useState(null);
   const [waitingForOperand, setWaitingForOperand] = useState(false);
+
+  // Focus management
+  useEffect(() => {
+    // Store the previously focused element
+    previousActiveElement.current = document.activeElement;
+
+    // Focus the close button when modal opens
+    if (closeButtonRef.current) {
+      closeButtonRef.current.focus();
+    }
+
+    // Handle escape key
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    // Trap focus within modal
+    const handleTabKey = (event) => {
+      if (event.key === 'Tab' && modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (event.shiftKey) {
+          if (document.activeElement === firstElement) {
+            lastElement.focus();
+            event.preventDefault();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            firstElement.focus();
+            event.preventDefault();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    document.addEventListener('keydown', handleTabKey);
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('keydown', handleTabKey);
+
+      // Return focus to previously focused element
+      if (previousActiveElement.current) {
+        previousActiveElement.current.focus();
+      }
+    };
+  }, [onClose]);
 
   const inputNumber = (num) => {
     if (waitingForOperand) {
@@ -54,9 +112,9 @@ export default function BasicCalculator({ onClose }) {
         return firstValue + secondValue;
       case '-':
         return firstValue - secondValue;
-      case '×':
+      case '*':
         return firstValue * secondValue;
-      case '÷':
+      case '/':
         return secondValue !== 0 ? firstValue / secondValue : 0;
       default:
         return secondValue;
@@ -86,11 +144,18 @@ export default function BasicCalculator({ onClose }) {
   };
 
   return (
-    <div className="calculator-modal">
-      <div className="calculator-container">
+    <div className="calculator-modal" role="dialog" aria-modal="true" aria-labelledby="calc-title">
+      <div className="calculator-container" ref={modalRef}>
         <div className="calculator-header">
-          <h3>Basic Calculator</h3>
-          <button className="close-button" onClick={onClose}>×</button>
+          <h3 id="calc-title">Basic Calculator</h3>
+          <button
+            ref={closeButtonRef}
+            className="close-button"
+            onClick={onClose}
+            aria-label="Close calculator"
+          >
+            <FiX size={20} />
+          </button>
         </div>
         
         <div className="calculator-display">
@@ -99,19 +164,19 @@ export default function BasicCalculator({ onClose }) {
         
         <div className="calculator-buttons">
           <button className="calc-btn function" onClick={clear}>C</button>
-          <button className="calc-btn function" onClick={handleSign}>±</button>
+          <button className="calc-btn function" onClick={handleSign}>+/-</button>
           <button className="calc-btn function" onClick={handlePercentage}>%</button>
-          <button className="calc-btn operator" onClick={() => performOperation('÷')}>÷</button>
+          <button className="calc-btn operator" onClick={() => performOperation('/')}>/</button>
           
           <button className="calc-btn number" onClick={() => inputNumber(7)}>7</button>
           <button className="calc-btn number" onClick={() => inputNumber(8)}>8</button>
           <button className="calc-btn number" onClick={() => inputNumber(9)}>9</button>
-          <button className="calc-btn operator" onClick={() => performOperation('×')}>×</button>
+          <button className="calc-btn operator" onClick={() => performOperation('*')}>*</button>
           
           <button className="calc-btn number" onClick={() => inputNumber(4)}>4</button>
           <button className="calc-btn number" onClick={() => inputNumber(5)}>5</button>
           <button className="calc-btn number" onClick={() => inputNumber(6)}>6</button>
-          <button className="calc-btn operator" onClick={() => performOperation('-')}>−</button>
+          <button className="calc-btn operator" onClick={() => performOperation('-')}>-</button>
           
           <button className="calc-btn number" onClick={() => inputNumber(1)}>1</button>
           <button className="calc-btn number" onClick={() => inputNumber(2)}>2</button>

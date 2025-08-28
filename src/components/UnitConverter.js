@@ -1,11 +1,69 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { FiX, FiRefreshCw } from 'react-icons/fi';
 
 export default function UnitConverter({ onClose }) {
+  const modalRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const previousActiveElement = useRef(null);
   const [category, setCategory] = useState('length');
   const [fromUnit, setFromUnit] = useState('');
   const [toUnit, setToUnit] = useState('');
   const [inputValue, setInputValue] = useState('');
   const [result, setResult] = useState('');
+
+  // Focus management
+  useEffect(() => {
+    // Store the previously focused element
+    previousActiveElement.current = document.activeElement;
+
+    // Focus the close button when modal opens
+    if (closeButtonRef.current) {
+      closeButtonRef.current.focus();
+    }
+
+    // Handle escape key
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    // Trap focus within modal
+    const handleTabKey = (event) => {
+      if (event.key === 'Tab' && modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (event.shiftKey) {
+          if (document.activeElement === firstElement) {
+            lastElement.focus();
+            event.preventDefault();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            firstElement.focus();
+            event.preventDefault();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    document.addEventListener('keydown', handleTabKey);
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('keydown', handleTabKey);
+
+      // Return focus to previously focused element
+      if (previousActiveElement.current) {
+        previousActiveElement.current.focus();
+      }
+    };
+  }, [onClose]);
 
   const unitCategories = {
     length: {
@@ -36,8 +94,8 @@ export default function UnitConverter({ onClose }) {
     temperature: {
       name: 'Temperature',
       units: {
-        celsius: { name: 'Celsius (°C)', factor: 1 },
-        fahrenheit: { name: 'Fahrenheit (°F)', factor: 1 },
+        celsius: { name: 'Celsius (C)', factor: 1 },
+        fahrenheit: { name: 'Fahrenheit (F)', factor: 1 },
         kelvin: { name: 'Kelvin (K)', factor: 1 }
       }
     },
@@ -57,11 +115,11 @@ export default function UnitConverter({ onClose }) {
     area: {
       name: 'Area',
       units: {
-        squareMeter: { name: 'Square Meter (m²)', factor: 1 },
-        squareKilometer: { name: 'Square Kilometer (km²)', factor: 1000000 },
-        squareCentimeter: { name: 'Square Centimeter (cm²)', factor: 0.0001 },
-        squareFoot: { name: 'Square Foot (ft²)', factor: 0.092903 },
-        squareInch: { name: 'Square Inch (in²)', factor: 0.00064516 },
+        squareMeter: { name: 'Square Meter (m^2)', factor: 1 },
+        squareKilometer: { name: 'Square Kilometer (km^2)', factor: 1000000 },
+        squareCentimeter: { name: 'Square Centimeter (cm^2)', factor: 0.0001 },
+        squareFoot: { name: 'Square Foot (ft^2)', factor: 0.092903 },
+        squareInch: { name: 'Square Inch (in^2)', factor: 0.00064516 },
         acre: { name: 'Acre', factor: 4046.86 },
         hectare: { name: 'Hectare (ha)', factor: 10000 }
       }
@@ -170,11 +228,18 @@ export default function UnitConverter({ onClose }) {
   };
 
   return (
-    <div className="calculator-modal">
-      <div className="unit-converter-container">
+    <div className="calculator-modal" role="dialog" aria-modal="true" aria-labelledby="converter-title">
+      <div className="unit-converter-container" ref={modalRef}>
         <div className="calculator-header">
-          <h3>Unit Converter</h3>
-          <button className="close-button" onClick={onClose}>×</button>
+          <h3 id="converter-title">Unit Converter</h3>
+          <button
+            ref={closeButtonRef}
+            className="close-button"
+            onClick={onClose}
+            aria-label="Close unit converter"
+          >
+            <FiX size={20} />
+          </button>
         </div>
         
         <div className="converter-content">
@@ -222,7 +287,7 @@ export default function UnitConverter({ onClose }) {
           {/* Swap Button */}
           <div className="swap-row">
             <button className="swap-button" onClick={swapUnits} title="Swap units">
-              ⇅
+              <FiRefreshCw size={20} />
             </button>
           </div>
 
