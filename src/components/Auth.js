@@ -10,10 +10,21 @@ export function LoginForm() {
 
   const { login, signup, authError } = useAuth();
 
+  const validateEmailDomain = (email) => {
+    return email.toLowerCase().endsWith('@hvl.no');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    // Validate email domain before proceeding
+    if (!validateEmailDomain(email)) {
+      setError('Only @hvl.no email addresses are allowed');
+      setLoading(false);
+      return;
+    }
 
     try {
       if (isSignup) {
@@ -34,7 +45,7 @@ export function LoginForm() {
         <h2>{isSignup ? 'Create Account' : 'Sign In'}</h2>
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">Email (@hvl.no domain required)</label>
             <input
               type="email"
               id="email"
@@ -42,7 +53,13 @@ export function LoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               required
               disabled={loading}
+              className={email && !validateEmailDomain(email) ? 'invalid-domain' : ''}
             />
+            {email && !validateEmailDomain(email) && (
+              <div className="domain-hint">
+                Please use your @hvl.no email address
+              </div>
+            )}
           </div>
           <div className="form-group">
             <label htmlFor="password">Password</label>
