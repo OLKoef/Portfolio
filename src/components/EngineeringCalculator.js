@@ -1,11 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 export default function EngineeringCalculator({ onClose }) {
+  const modalRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const previousActiveElement = useRef(null);
   const [display, setDisplay] = useState('0');
   const [previousValue, setPreviousValue] = useState(null);
   const [operation, setOperation] = useState(null);
   const [waitingForOperand, setWaitingForOperand] = useState(false);
   const [angleMode, setAngleMode] = useState('DEG'); // DEG or RAD
+
+  // Focus management
+  useEffect(() => {
+    // Store the previously focused element
+    previousActiveElement.current = document.activeElement;
+
+    // Focus the close button when modal opens
+    if (closeButtonRef.current) {
+      closeButtonRef.current.focus();
+    }
+
+    // Handle escape key
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    // Trap focus within modal
+    const handleTabKey = (event) => {
+      if (event.key === 'Tab' && modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (event.shiftKey) {
+          if (document.activeElement === firstElement) {
+            lastElement.focus();
+            event.preventDefault();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            firstElement.focus();
+            event.preventDefault();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    document.addEventListener('keydown', handleTabKey);
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('keydown', handleTabKey);
+
+      // Return focus to previously focused element
+      if (previousActiveElement.current) {
+        previousActiveElement.current.focus();
+      }
+    };
+  }, [onClose]);
 
   const inputNumber = (num) => {
     if (waitingForOperand) {
@@ -145,16 +202,21 @@ export default function EngineeringCalculator({ onClose }) {
   };
 
   return (
-    <div className="calculator-modal">
-      <div className="calculator-container engineering">
+    <div className="calculator-modal" role="dialog" aria-modal="true" aria-labelledby="eng-calc-title">
+      <div className="calculator-container engineering" ref={modalRef}>
         <div className="calculator-header">
-          <h3>Engineering Calculator</h3>
+          <h3 id="eng-calc-title">Engineering Calculator</h3>
           <div className="angle-mode">
             <button className="mode-toggle" onClick={toggleAngleMode}>
               {angleMode}
             </button>
           </div>
-          <button className="close-button" onClick={onClose}>×</button>
+          <button
+            ref={closeButtonRef}
+            className="close-button"
+            onClick={onClose}
+            aria-label="Close engineering calculator"
+          >×</button>
         </div>
         
         <div className="calculator-display">
