@@ -460,10 +460,115 @@ body {
 }
 
 /* Dashboard Content */
-.dashboard-content h2 {
-  margin-top: 0;
-  margin-bottom: 1.5rem;
+.dashboard-content {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.dashboard-welcome {
+  text-align: center;
+  margin-bottom: 3rem;
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-welcome h2 {
+  margin: 0 0 0.5rem 0;
   color: #1e293b;
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+.dashboard-welcome p {
+  margin: 0;
+  color: #64748b;
+  font-size: 1.125rem;
+}
+
+.upload-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.upload-section h3 {
+  margin: 0 0 1.5rem 0;
+  color: #1e293b;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.upload-buttons {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+}
+
+.upload-button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  background: #f8fafc;
+  border: 2px solid #e2e8f0;
+  border-radius: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-align: center;
+  min-height: 180px;
+  justify-content: center;
+  gap: 1rem;
+}
+
+.upload-button:hover {
+  border-color: #4c51bf;
+  background: #eef2ff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 16px rgba(76, 81, 191, 0.15);
+}
+
+.upload-button svg {
+  color: #6b7280;
+  transition: color 0.3s ease;
+}
+
+.upload-button:hover svg {
+  color: #4c51bf;
+}
+
+.upload-label {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin: 0;
+}
+
+.upload-description {
+  font-size: 0.875rem;
+  color: #6b7280;
+  margin: 0;
+  line-height: 1.4;
+}
+
+.notes-upload:hover {
+  border-color: #059669;
+  background: #ecfdf5;
+}
+
+.notes-upload:hover svg {
+  color: #059669;
+}
+
+.resources-upload:hover {
+  border-color: #dc2626;
+  background: #fef2f2;
+}
+
+.resources-upload:hover svg {
+  color: #dc2626;
 }
 
 .dashboard-overview {
