@@ -287,7 +287,7 @@ export default function UnitConverter({ onClose }) {
           {/* Swap Button */}
           <div className="swap-row">
             <button className="swap-button" onClick={swapUnits} title="Swap units">
-              ⇅
+              <FiRefreshCw size={20} />
             </button>
           </div>
 
