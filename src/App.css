@@ -606,6 +606,32 @@ body {
   color: #dc2626;
 }
 
+.notes-upload.drag-over {
+  animation: notesDragPulse 1s ease-in-out infinite alternate;
+}
+
+.resources-upload.drag-over {
+  animation: resourcesDragPulse 1s ease-in-out infinite alternate;
+}
+
+@keyframes notesDragPulse {
+  0% {
+    box-shadow: 0 12px 24px rgba(5, 150, 105, 0.25);
+  }
+  100% {
+    box-shadow: 0 16px 32px rgba(5, 150, 105, 0.35);
+  }
+}
+
+@keyframes resourcesDragPulse {
+  0% {
+    box-shadow: 0 12px 24px rgba(220, 38, 38, 0.25);
+  }
+  100% {
+    box-shadow: 0 16px 32px rgba(220, 38, 38, 0.35);
+  }
+}
+
 /* Responsive Dashboard */
 @media (max-width: 768px) {
   .dashboard-welcome {
