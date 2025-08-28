@@ -539,6 +539,37 @@ body {
   color: #4c51bf;
 }
 
+.upload-button.drag-over {
+  border-color: #4c51bf;
+  background: #eef2ff;
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(76, 81, 191, 0.25);
+  animation: dragPulse 1s ease-in-out infinite alternate;
+}
+
+.upload-button.drag-over svg {
+  color: #4c51bf;
+  animation: dragBounce 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes dragPulse {
+  0% {
+    box-shadow: 0 12px 24px rgba(76, 81, 191, 0.25);
+  }
+  100% {
+    box-shadow: 0 16px 32px rgba(76, 81, 191, 0.35);
+  }
+}
+
+@keyframes dragBounce {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.1);
+  }
+}
+
 .upload-label {
   font-size: 1.125rem;
   font-weight: 600;
