@@ -1146,6 +1146,39 @@ body {
   line-height: 1.4;
 }
 
+.settings-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  background: white;
+  transition: border-color 0.2s;
+}
+
+.settings-input:focus {
+  outline: none;
+  border-color: #4c51bf;
+}
+
+.settings-textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  background: white;
+  resize: vertical;
+  min-height: 100px;
+  transition: border-color 0.2s;
+  font-family: inherit;
+}
+
+.settings-textarea:focus {
+  outline: none;
+  border-color: #4c51bf;
+}
+
 .settings-select {
   width: 100%;
   padding: 0.75rem;
