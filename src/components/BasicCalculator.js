@@ -1,10 +1,67 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 export default function BasicCalculator({ onClose }) {
+  const modalRef = useRef(null);
+  const closeButtonRef = useRef(null);
+  const previousActiveElement = useRef(null);
   const [display, setDisplay] = useState('0');
   const [previousValue, setPreviousValue] = useState(null);
   const [operation, setOperation] = useState(null);
   const [waitingForOperand, setWaitingForOperand] = useState(false);
+
+  // Focus management
+  useEffect(() => {
+    // Store the previously focused element
+    previousActiveElement.current = document.activeElement;
+
+    // Focus the close button when modal opens
+    if (closeButtonRef.current) {
+      closeButtonRef.current.focus();
+    }
+
+    // Handle escape key
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    // Trap focus within modal
+    const handleTabKey = (event) => {
+      if (event.key === 'Tab' && modalRef.current) {
+        const focusableElements = modalRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0];
+        const lastElement = focusableElements[focusableElements.length - 1];
+
+        if (event.shiftKey) {
+          if (document.activeElement === firstElement) {
+            lastElement.focus();
+            event.preventDefault();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            firstElement.focus();
+            event.preventDefault();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleEscape);
+    document.addEventListener('keydown', handleTabKey);
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener('keydown', handleTabKey);
+
+      // Return focus to previously focused element
+      if (previousActiveElement.current) {
+        previousActiveElement.current.focus();
+      }
+    };
+  }, [onClose]);
 
   const inputNumber = (num) => {
     if (waitingForOperand) {
@@ -86,11 +143,16 @@ export default function BasicCalculator({ onClose }) {
   };
 
   return (
-    <div className="calculator-modal">
-      <div className="calculator-container">
+    <div className="calculator-modal" role="dialog" aria-modal="true" aria-labelledby="calc-title">
+      <div className="calculator-container" ref={modalRef}>
         <div className="calculator-header">
-          <h3>Basic Calculator</h3>
-          <button className="close-button" onClick={onClose}>×</button>
+          <h3 id="calc-title">Basic Calculator</h3>
+          <button
+            ref={closeButtonRef}
+            className="close-button"
+            onClick={onClose}
+            aria-label="Close calculator"
+          >×</button>
         </div>
         
         <div className="calculator-display">
