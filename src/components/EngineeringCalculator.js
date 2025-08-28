@@ -113,9 +113,9 @@ export default function EngineeringCalculator({ onClose }) {
         return firstValue + secondValue;
       case '-':
         return firstValue - secondValue;
-      case '×':
+      case '*':
         return firstValue * secondValue;
-      case '÷':
+      case '/':
         return secondValue !== 0 ? firstValue / secondValue : 0;
       case '^':
         return Math.pow(firstValue, secondValue);
@@ -235,30 +235,30 @@ export default function EngineeringCalculator({ onClose }) {
           <button className="calc-btn function" onClick={() => handleFunction('log')}>log</button>
 
           {/* Row 2 - Power and Root Functions */}
-          <button className="calc-btn function" onClick={() => handleFunction('sqrt')}>√</button>
-          <button className="calc-btn function" onClick={() => handleFunction('square')}>x²</button>
+          <button className="calc-btn function" onClick={() => handleFunction('sqrt')}>sqrt</button>
+          <button className="calc-btn function" onClick={() => handleFunction('square')}>x^2</button>
           <button className="calc-btn function" onClick={() => performOperation('^')}>x^y</button>
-          <button className="calc-btn function" onClick={() => handleFunction('exp')}>eˣ</button>
+          <button className="calc-btn function" onClick={() => handleFunction('exp')}>e^x</button>
           <button className="calc-btn function" onClick={() => handleFunction('factorial')}>x!</button>
 
           {/* Row 3 - Constants and Operations */}
-          <button className="calc-btn function" onClick={() => handleFunction('pi')}>π</button>
+          <button className="calc-btn function" onClick={() => handleFunction('pi')}>pi</button>
           <button className="calc-btn function" onClick={() => handleFunction('e')}>e</button>
           <button className="calc-btn function" onClick={() => handleFunction('reciprocal')}>1/x</button>
           <button className="calc-btn function" onClick={clear}>C</button>
-          <button className="calc-btn operator" onClick={() => performOperation('÷')}>÷</button>
+          <button className="calc-btn operator" onClick={() => performOperation('/')}>/</button>
 
           {/* Row 4 - Numbers and Operations */}
           <button className="calc-btn number" onClick={() => inputNumber(7)}>7</button>
           <button className="calc-btn number" onClick={() => inputNumber(8)}>8</button>
           <button className="calc-btn number" onClick={() => inputNumber(9)}>9</button>
-          <button className="calc-btn operator" onClick={() => performOperation('×')}>×</button>
+          <button className="calc-btn operator" onClick={() => performOperation('*')}>*</button>
           <button className="calc-btn number" onClick={() => inputNumber(4)}>4</button>
 
           {/* Row 5 - Numbers and Operations */}
           <button className="calc-btn number" onClick={() => inputNumber(5)}>5</button>
           <button className="calc-btn number" onClick={() => inputNumber(6)}>6</button>
-          <button className="calc-btn operator" onClick={() => performOperation('-')}>−</button>
+          <button className="calc-btn operator" onClick={() => performOperation('-')}>-</button>
           <button className="calc-btn number" onClick={() => inputNumber(1)}>1</button>
           <button className="calc-btn number" onClick={() => inputNumber(2)}>2</button>
 
