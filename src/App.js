@@ -56,17 +56,15 @@ function AppContent() {
             </button>
           </nav>
           <div className="header-user-actions">
+            <button className="settings-button" aria-label="Settings">
+              ⚙️
+            </button>
             <SignOutButton />
           </div>
         </div>
       </header>
 
       <main className="app-main" aria-hidden={activeCalculator ? 'true' : 'false'}>
-        {activeTab === 'dashboard' && (
-          <div className="user-profile-corner">
-            <UserInfo />
-          </div>
-        )}
         {activeTab === 'portfolio' && (
           <div className="portfolio-content">
             <BuilderPage urlPath="/" />
