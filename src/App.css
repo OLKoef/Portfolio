@@ -1340,6 +1340,12 @@ input:checked + .toggle-slider:before {
   .settings-theme-toggle {
     flex-direction: column;
   }
+
+  .settings-input,
+  .settings-textarea,
+  .settings-select {
+    font-size: 1rem;
+  }
 }
 
 .fallback-content {
