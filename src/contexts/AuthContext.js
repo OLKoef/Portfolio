@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { supabase } from '../supabase/config';
 
 const AuthContext = createContext();
 
@@ -8,20 +9,95 @@ export function useAuth() {
 
 export function AuthProvider({ children }) {
   const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [authError, setAuthError] = useState('Supabase authentication not yet configured');
+  const [loading, setLoading] = useState(true);
+  const [authError, setAuthError] = useState(null);
 
-  // TODO: Implement Supabase authentication here
-  async function signup(email, pin) {
-    throw new Error('Authentication requires Supabase configuration. Please connect to Supabase.');
+  useEffect(() => {
+    // Get initial session
+    const getSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setCurrentUser(session?.user || null);
+      setLoading(false);
+    };
+
+    getSession();
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        setCurrentUser(session?.user || null);
+        setLoading(false);
+      }
+    );
+
+    return () => subscription?.unsubscribe();
+  }, []);
+
+  async function signup(email, password) {
+    setLoading(true);
+    setAuthError(null);
+    
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (error) {
+        setAuthError(error.message);
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      setAuthError(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   }
 
-  async function login(email, pin) {
-    throw new Error('Authentication requires Supabase configuration. Please connect to Supabase.');
+  async function login(email, password) {
+    setLoading(true);
+    setAuthError(null);
+    
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        setAuthError(error.message);
+        throw error;
+      }
+
+      return data;
+    } catch (error) {
+      setAuthError(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function logout() {
-    throw new Error('Authentication requires Supabase configuration. Please connect to Supabase.');
+    setLoading(true);
+    setAuthError(null);
+    
+    try {
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        setAuthError(error.message);
+        throw error;
+      }
+    } catch (error) {
+      setAuthError(error.message);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   }
 
   const value = {
@@ -30,12 +106,13 @@ export function AuthProvider({ children }) {
     login,
     logout,
     authError,
-    isFirebaseConfigured: false // Changed from firebaseError to authError
+    loading,
+    isSupabaseConfigured: true
   };
 
   return (
     <AuthContext.Provider value={value}>
-      {children}
+      {!loading && children}
     </AuthContext.Provider>
   );
 }
