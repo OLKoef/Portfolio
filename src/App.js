@@ -157,7 +157,7 @@ function AppContent() {
                 </button>
 
                 <button className="upload-button resources-upload" onClick={() => handleUpload('resources')}>
-                  <FiFolderOpen size={24} />
+                  <FiFolder size={24} />
                   <span className="upload-label">Upload Resources</span>
                   <span className="upload-description">Add learning resources and materials</span>
                 </button>
