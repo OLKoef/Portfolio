@@ -6,12 +6,14 @@ import BuilderContent, { BuilderPage } from './components/BuilderContent';
 import BasicCalculator from './components/BasicCalculator';
 import EngineeringCalculator from './components/EngineeringCalculator';
 import UnitConverter from './components/UnitConverter';
+import Settings from './components/Settings';
 import './App.css';
 
 function AppContent() {
   const { currentUser } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
   const [activeCalculator, setActiveCalculator] = useState(null);
+  const [showSettings, setShowSettings] = useState(false);
 
   const openCalculator = (calculatorType) => {
     setActiveCalculator(calculatorType);
@@ -21,12 +23,20 @@ function AppContent() {
     setActiveCalculator(null);
   };
 
+  const openSettings = () => {
+    setShowSettings(true);
+  };
+
+  const closeSettings = () => {
+    setShowSettings(false);
+  };
+
   if (!currentUser) {
     return <LoginForm />;
   }
 
   return (
-    <div className="app" aria-hidden={activeCalculator ? 'true' : 'false'}>
+    <div className="app" aria-hidden={activeCalculator || showSettings ? 'true' : 'false'}>
       <header className="app-header" aria-hidden={activeCalculator ? 'true' : 'false'}>
         <div className="header-content">
           <h1 className="app-title">BØY</h1>
