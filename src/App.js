@@ -57,7 +57,7 @@ function AppContent() {
           </nav>
           <div className="header-user-actions">
             <button className="settings-button" aria-label="Settings">
-              ⚙️
+              SET
             </button>
             <SignOutButton />
           </div>
