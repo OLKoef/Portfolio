@@ -25,8 +25,8 @@ function AppContent() {
   }
 
   return (
-    <div className="app">
-      <header className="app-header">
+    <div className="app" aria-hidden={activeCalculator ? 'true' : 'false'}>
+      <header className="app-header" aria-hidden={activeCalculator ? 'true' : 'false'}>
         <div className="header-content">
           <h1 className="app-title">BØY</h1>
           <nav className="main-nav">
@@ -61,7 +61,7 @@ function AppContent() {
         </div>
       </header>
 
-      <main className="app-main">
+      <main className="app-main" aria-hidden={activeCalculator ? 'true' : 'false'}>
         {activeTab === 'dashboard' && (
           <div className="user-profile-corner">
             <UserInfo />
@@ -113,7 +113,7 @@ function AppContent() {
         )}
       </main>
 
-      <footer className="app-footer">
+      <footer className="app-footer" aria-hidden={activeCalculator ? 'true' : 'false'}>
         <p>&copy; 2024 Portfolio. Built with React, Supabase, and Builder.io</p>
       </footer>
 
