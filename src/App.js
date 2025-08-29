@@ -169,6 +169,9 @@ function AppContent() {
       <main className="app-main" aria-hidden={activeCalculator || showSettings ? 'true' : 'false'}>
         {activeTab === 'portfolio' && (
           <div className="portfolio-content">
+            <div className="portfolio-header">
+              <h2>Portfolio 😊</h2>
+            </div>
             <BuilderPage urlPath="/" />
           </div>
         )}
