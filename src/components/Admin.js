@@ -83,6 +83,24 @@ const Admin = () => {
                 <button className="admin-action-button">Export Users</button>
                 <button className="admin-action-button">Send Notifications</button>
               </div>
+
+              <div className="promote-admin-section">
+                <h4>Promote User to Admin</h4>
+                <div className="promote-admin-form">
+                  <div className="setting-group">
+                    <label>Supabase User ID</label>
+                    <input
+                      type="text"
+                      placeholder="Enter Supabase user ID..."
+                      className="admin-user-id-input"
+                    />
+                  </div>
+                  <button className="admin-action-button promote-admin">
+                    Promote to Admin
+                  </button>
+                </div>
+              </div>
+
               <div className="user-table-placeholder">
                 <p>User management table would be displayed here</p>
               </div>
