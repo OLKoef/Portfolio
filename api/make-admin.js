@@ -18,8 +18,8 @@ module.exports = async (req, res) => {
 
     // Verify caller with anon client + bearer token
     const publicClient = createClient(
-      process.env.SUPABASE_URL,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+      process.env.REACT_APP_SUPABASE_URL,
+      process.env.REACT_APP_SUPABASE_ANON_KEY,
       {
         global: { headers: { Authorization: `Bearer ${token}` } }
       }
