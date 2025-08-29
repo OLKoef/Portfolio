@@ -22,7 +22,8 @@ const Admin = () => {
     }
 
     // 3. Kall ditt API på Vercel
-    const res = await fetch("https://portfolio-pi-ashen-79.vercel.app/api/make-admin", {
+    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || '';
+    const res = await fetch(`${apiBaseUrl}/api/make-admin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
