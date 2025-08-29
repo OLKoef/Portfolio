@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FiUsers, FiSettings, FiDatabase, FiActivity, FiShield } from 'react-icons/fi';
+import { supabase } from '../supabase/config';
 
 const Admin = () => {
   const [activeSection, setActiveSection] = useState('overview');
