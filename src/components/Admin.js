@@ -5,6 +5,40 @@ const Admin = () => {
   const [activeSection, setActiveSection] = useState('overview');
   const [userId, setUserId] = useState('');
 
+  const promoteUser = async () => {
+    // 1. Hent access token fra Supabase (for å bevise at du er innlogget)
+    const { data, error } = await window.supabase.auth.getSession();
+    if (error || !data.session) {
+      alert("You must be logged in first!");
+      return;
+    }
+    const token = data.session.access_token;
+
+    // 2. Hent userId fra input (binder til state.userId)
+    if (!userId) {
+      alert("Please enter a userId");
+      return;
+    }
+
+    // 3. Kall ditt API på Vercel
+    const res = await fetch("/api/make-admin", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token}`
+      },
+      body: JSON.stringify({ userId })
+    });
+
+    // 4. Håndter svar
+    const json = await res.json();
+    if (res.ok) {
+      alert("✅ User promoted to admin!\n" + JSON.stringify(json.user));
+    } else {
+      alert("❌ Error: " + json.error);
+    }
+  };
+
   return (
     <div className="admin-container">
       <div className="admin-header">
