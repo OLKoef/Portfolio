@@ -152,9 +152,9 @@ function AppContent() {
             <button
               className={`nav-button ${activeTab === 'admin' ? 'active' : ''}`}
               onClick={() => setActiveTab('admin')}
+              aria-label="Admin"
             >
               <FiShield size={16} />
-              Admin
             </button>
           </nav>
           <div className="header-user-actions">
