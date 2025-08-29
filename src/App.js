@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FiSettings, FiUpload, FiBookOpen, FiFolder } from 'react-icons/fi';
+import { FiSettings, FiUpload, FiBookOpen, FiFolder, FiShield } from 'react-icons/fi';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LoginForm, UserInfo, SignOutButton } from './components/Auth';
 import BuilderContent, { BuilderPage } from './components/BuilderContent';
@@ -7,6 +7,7 @@ import BasicCalculator from './components/BasicCalculator';
 import EngineeringCalculator from './components/EngineeringCalculator';
 import UnitConverter from './components/UnitConverter';
 import Settings from './components/Settings';
+import Admin from './components/Admin';
 import './App.css';
 
 function AppContent() {
@@ -148,6 +149,13 @@ function AppContent() {
             >
               Resources
             </button>
+            <button
+              className={`nav-button ${activeTab === 'admin' ? 'active' : ''}`}
+              onClick={() => setActiveTab('admin')}
+              aria-label="Admin"
+            >
+              <FiShield size={16} />
+            </button>
           </nav>
           <div className="header-user-actions">
             <button className="settings-button" onClick={openSettings} aria-label="Settings">
@@ -239,6 +247,12 @@ function AppContent() {
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {activeTab === 'admin' && (
+          <div className="admin-content">
+            <Admin />
           </div>
         )}
       </main>
