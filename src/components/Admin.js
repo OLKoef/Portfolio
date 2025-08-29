@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { FiUsers, FiSettings, FiDatabase, FiActivity, FiShield } from 'react-icons/fi';
+import { supabase } from '../supabase/config';
 
 const Admin = () => {
   const [activeSection, setActiveSection] = useState('overview');
@@ -7,7 +8,7 @@ const Admin = () => {
 
   const promoteUser = async () => {
     // 1. Hent access token fra Supabase (for å bevise at du er innlogget)
-    const { data, error } = await window.supabase.auth.getSession();
+    const { data, error } = await supabase.auth.getSession();
     if (error || !data.session) {
       alert("You must be logged in first!");
       return;
@@ -21,7 +22,8 @@ const Admin = () => {
     }
 
     // 3. Kall ditt API på Vercel
-    const res = await fetch("/api/make-admin", {
+    const apiBaseUrl = process.env.REACT_APP_API_BASE_URL || '';
+    const res = await fetch(`${apiBaseUrl}/api/make-admin`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
