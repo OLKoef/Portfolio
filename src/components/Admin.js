@@ -128,9 +128,14 @@ const Admin = () => {
                       type="text"
                       placeholder="Enter Supabase user ID..."
                       className="admin-user-id-input"
+                      value={userId}
+                      onChange={(e) => setUserId(e.target.value)}
                     />
                   </div>
-                  <button className="admin-action-button promote-admin">
+                  <button
+                    className="admin-action-button promote-admin"
+                    onClick={promoteUser}
+                  >
                     Promote to Admin
                   </button>
                 </div>
