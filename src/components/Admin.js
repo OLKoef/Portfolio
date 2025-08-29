@@ -3,6 +3,7 @@ import { FiUsers, FiSettings, FiDatabase, FiActivity, FiShield } from 'react-ico
 
 const Admin = () => {
   const [activeSection, setActiveSection] = useState('overview');
+  const [userId, setUserId] = useState('');
 
   return (
     <div className="admin-container">
