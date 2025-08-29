@@ -2708,6 +2708,57 @@ input:checked + .toggle-slider:before {
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
 }
 
+.admin-action-button.promote-admin {
+  background: #dc2626;
+  margin-top: 1rem;
+}
+
+.admin-action-button.promote-admin:hover {
+  background: #b91c1c;
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+}
+
+.promote-admin-section {
+  background: #f8fafc;
+  padding: 1.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 2rem;
+}
+
+.promote-admin-section h4 {
+  color: #1e293b;
+  margin-bottom: 1rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.promote-admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.admin-user-id-input {
+  padding: 0.75rem;
+  border: 2px solid #e5e7eb;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  background: white;
+  transition: border-color 0.2s;
+  font-family: monospace;
+}
+
+.admin-user-id-input:focus {
+  outline: none;
+  border-color: #4c51bf;
+}
+
+.admin-user-id-input::placeholder {
+  color: #9ca3af;
+  font-family: inherit;
+}
+
 .user-table-placeholder {
   background: #f8fafc;
   padding: 2rem;
