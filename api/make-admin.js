@@ -42,7 +42,7 @@ module.exports = async (req, res) => {
 
     // 3) Update target user with Service Role Key
     const adminClient = createClient(
-      process.env.SUPABASE_URL,
+      process.env.REACT_APP_SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
     )
 
