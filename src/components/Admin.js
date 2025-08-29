@@ -8,7 +8,7 @@ const Admin = () => {
 
   const promoteUser = async () => {
     // 1. Hent access token fra Supabase (for å bevise at du er innlogget)
-    const { data, error } = await window.supabase.auth.getSession();
+    const { data, error } = await supabase.auth.getSession();
     if (error || !data.session) {
       alert("You must be logged in first!");
       return;
